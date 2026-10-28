@@ -4,17 +4,53 @@ Persönliche PWA für den Alltag: Heute-Ansicht, Aufgaben (Muss/Soll/Kann, Frist
 
 **Alle Daten bleiben auf dem Gerät.** Es gibt keinen Server, kein Konto und keine Synchronisation.
 
-## Phase 1 (dieser Stand)
+## Funktionen
 
-- **Heute**: nächster Aufbruch mit Countdown und Navigation, Termine heute, überfällige und heute fällige Aufgaben, weitere Muss-Aufgaben, Vorschau auf morgen
-- **Aufgaben**: Priorität, Kategorie, Frist mit optionaler Uhrzeit, Notizen, Filter nach Kategorie, Rückgängig beim Abhaken
+**Phase 1**
+- **Heute**: nächster Aufbruch mit Countdown und Navigation, überfällige und heute fällige Aufgaben, weitere Muss-Aufgaben, Vorschau auf morgen
+- **Aufgaben**: Priorität in drei Stufen (Muss/Soll/Kann), Kategorie, Frist mit optionaler Uhrzeit, Notizen, Filter nach Kategorie, Rückgängig beim Abhaken
 - **Termine**: Datum, Beginn/Ende, Ort (mit Vorschlägen aus gespeicherten Orten), Fahrzeit-Puffer, Losfahr-Alarm, Kalenderdatei (.ics) mit Erinnerung zur Losfahrzeit
 - **Orte**: Name, optionale Adresse für die Navigation, Puffer in Minuten; wird beim Speichern eines Termins automatisch gemerkt
 - **Anhänge** pro Aufgabe/Termin in IndexedDB, nur lokal, mit Hinweis „keine eingestuften Dokumente“
 - **Export/Import** als JSON, wahlweise mit Anhängen und optional verschlüsselt (AES-256-GCM, Schlüssel per PBKDF2-SHA-256 mit 600 000 Iterationen)
 - Offline-fähig (Service Worker), dunkles Design, Bedienung mit dem Daumen (Tab-Leiste und Plus-Button unten, Eingabemasken als Bottom-Sheets)
 
-Geplant für später: Routinen, Vorlagen mit Vorlauf, Wochenplan, Schnell-Eingabe, Kalender- und Erinnerungs-Anbindung.
+**Phase 2**
+- **Stundenplan (Plan → Tag)**: Zeitleiste mit Terminen und eingeplanten Aufgaben. Was sich zeitlich überschneidet, steht nebeneinander, z. B. Unterricht 07:30–16:00 und parallel „Mails 09:45–10:15“. Ein Tipp auf eine freie Stelle plant dort etwas ein.
+- **Aufgaben einplanen**: Jede Aufgabe kann zusätzlich zur Frist ein Zeitfenster bekommen (Tag, von–bis) und erscheint dann im Stundenplan.
+- **Jetzt-Karte auf „Heute“**: zeigt alles, was gerade läuft, auch mehreres parallel, mit Restzeit und dem nächsten Punkt.
+- **Tagesbriefing**: erscheint beim ersten Öffnen am Tag (abschaltbar). Es zeigt Kennzahlen (Termine, fällig, überfällig, Muss offen), den ersten Aufbruch, den Ablauf mit Uhrzeiten, die wichtigsten Aufgaben und einen Ausblick auf morgen. Jederzeit erreichbar über das Listen-Symbol oben rechts.
+- **Wochenplan (Plan → Woche)**: sieben Tage untereinander mit Kalenderwoche. Ein Tipp auf einen Tag öffnet seinen Stundenplan.
+- **Routinen**:
+  - Wiederkehrende Termine (z. B. werktags Unterricht, Di/Do Training) und Aufgaben (z. B. täglich Vokabeln, monatlich Bericht).
+  - Möglich sind täglich, werktags, wöchentlich an bestimmten Tagen, monatlich oder alle n Tage, mit optionalem Enddatum.
+  - Einzelne Serientermine lassen sich ausfallen lassen oder abweichend ändern.
+  - Aufgaben-Routinen haben einen **Vorlauf**: Die Aufgabe erscheint so viele Tage vor dem Termin.
+- **Vorlagen mit Vorlauf**: Eine Vorlage, z. B. „Prüfung“, legt zu einem Stichtag alle Vorbereitungsaufgaben mit passender Frist an (21 Tage vorher Lernplan, 7 Tage vorher Probeklausur …) und optional den Termin selbst. Drei Beispielvorlagen sind eingebaut.
+- **Schnell-Eingabe** (Plus-Button): eine Zeile Text, eine Live-Vorschau, fertig. Siehe unten.
+- **Backup-Erinnerung**, wenn die letzte Sicherung länger als 14 Tage zurückliegt.
+
+### Schnell-Eingabe
+
+| Was | Schreibweise |
+|---|---|
+| Datum | `heute`, `morgen`, `übermorgen`, `Fr`, `Montag`, `30.10.`, `in 3 Tagen`, `nächste Woche` |
+| Zeit | `18 Uhr`, `7:30`, `7:30-16:00`, `von 9 bis 11 Uhr` |
+| Frist | `bis Fr`, `bis 31.12.`, `bis morgen 12 Uhr` |
+| Ort (am Ende) | `@Schule` · Fahrzeit-Puffer: `+20` |
+| Priorität | `!muss`, `!soll`, `!kann` (oder `!1`, `!2`, `!3`; `!` allein = Muss) |
+| Kategorie | `#dienst`, `#lernen`, `#training`, `#privat` |
+| Wiederholung | `täglich`, `werktags`, `jeden Di und Do`, `wöchentlich`, `monatlich`, `alle 3 Tage` |
+
+Mit Uhrzeit oder Ort wird ein **Termin** daraus, mit Priorität, Kategorie oder Frist eine **Aufgabe**. Die Art lässt sich vor dem Speichern umschalten.
+
+Beispiele:
+- `werktags 7:30-16:00 Unterricht @Schule +35`
+- `morgen 9:45-10:15 Mails beantworten #dienst !muss`: Aufgabe, im Stundenplan parallel zum Unterricht
+- `Reiseantrag bis Fr !muss #dienst`
+- `Training jeden Di und Do 18-19:30 Uhr @Halle`
+
+Geplant für später: Kalender- und Erinnerungs-Anbindung (eine einzelne .ics-Datei lässt sich schon heute pro Termin erzeugen).
 
 ### Hinweis zum Alarm auf dem iPhone
 
