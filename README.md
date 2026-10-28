@@ -46,6 +46,23 @@ Persönliche PWA für den Alltag: Heute-Ansicht, Aufgaben (Muss/Soll/Kann, Frist
   - Offene Aufgaben lassen sich mit einem Tipp auf morgen verschieben.
   - Läuft die App abends im Hintergrund und sind Benachrichtigungen erlaubt, kommt eine Systembenachrichtigung.
 
+**Phase 2.2**
+- **Standard-Puffer für neue Orte**:
+  - Tippst du im Termin einen Ort ein, den die App noch nicht kennt, schlägt sie automatisch einen Standard-Puffer vor (Standard 30 min, einstellbar unter Mehr → Orte).
+  - Ein von Hand gesetzter Puffer wird nicht überschrieben.
+  - Gilt auch für die Schnell-Eingabe und für Vorlagen.
+- **Warnung „Fahrzeit fehlt“**:
+  - Gilt für Termine mit Ort und Losfahr-Alarm, aber 0 min Puffer. Dort käme der Alarm erst zum Terminbeginn.
+  - Die Warnung erscheint im Termin, in der Terminliste, im Stundenplan (roter Rand), im Wochenplan, im Briefing, im Abend-Check und als rote Karte auf „Heute“ für die nächsten 7 Tage.
+  - Ein Tipp öffnet den Termin zum Nachtragen.
+  - Termine ohne Weg (z. B. „Online“) bekommen keine Warnung, wenn der Losfahr-Alarm ausgeschaltet ist.
+- **Zuschlag im Berufsverkehr**:
+  - Funktioniert komplett offline.
+  - Fällt die Fahrt an einem Werktag ganz oder teilweise in ein Stoßzeit-Fenster (Standard 06–09 und 15–18 Uhr), wird der Puffer um einen Prozentsatz erhöht (Standard +25 %, aufgerundet auf 5 min).
+  - Beispiel: Termin 07:30, Puffer 30 min → losfahren 06:50 statt 07:00.
+  - Fenster und Prozentsatz sind unter Mehr → Orte einstellbar, der Zuschlag lässt sich dort auch abschalten.
+  - Er wirkt auf Alarm, Vorwarnung, Aufbruch-Karte, Briefing, Abend-Check und die .ics-Datei.
+
 ### Schnell-Eingabe
 
 | Was | Schreibweise |
