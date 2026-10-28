@@ -30,6 +30,22 @@ Persönliche PWA für den Alltag: Heute-Ansicht, Aufgaben (Muss/Soll/Kann, Frist
 - **Schnell-Eingabe** (Plus-Button): eine Zeile Text, eine Live-Vorschau, fertig. Siehe unten.
 - **Backup-Erinnerung**, wenn die letzte Sicherung länger als 14 Tage zurückliegt.
 
+**Phase 2.1**
+- **Vorwarnung vor dem Losfahren**:
+  - Einstellbar unter Mehr → Losfahr-Alarm: 5–30 Minuten vor der Losfahrzeit kommt ein kürzerer, gelber Hinweis „Fertig machen“. Standard sind 10 Minuten.
+  - Die Vorwarnung erscheint auch auf der Aufbruch-Karte, im Briefing und im Termin.
+  - Die .ics-Datei enthält sie als zweiten Kalender-Alarm.
+- **Checklisten in Aufgaben**:
+  - Unterpunkte mit Haken. Ein Haken wird sofort gespeichert, auch ohne „Speichern“.
+  - In der Liste zeigt jede Aufgabe ihren Fortschritt (z. B. 2/5). Sind alle Punkte erledigt, bietet die App an, die Aufgabe abzuhaken.
+  - Aufgaben-Routinen können eine Checkliste haben; jeder neue Eintrag startet mit leerer Liste.
+  - In der Schnell-Eingabe: `Tasche packen: Ausweis, Laptop, Ladekabel`.
+- **Abend-Check „Morgen vorbereiten“**:
+  - Erscheint ab einer einstellbaren Uhrzeit (Standard 20:00) beim Öffnen der App, einmal pro Abend. Danach bleibt er als Karte auf „Heute“ erreichbar.
+  - Inhalt: Aufbruch morgen mit Vorwarnung, Ablauf morgen, was vorzubereiten ist (mit Checklisten-Stand) und was heute noch offen ist.
+  - Offene Aufgaben lassen sich mit einem Tipp auf morgen verschieben.
+  - Läuft die App abends im Hintergrund und sind Benachrichtigungen erlaubt, kommt eine Systembenachrichtigung.
+
 ### Schnell-Eingabe
 
 | Was | Schreibweise |

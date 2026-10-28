@@ -166,7 +166,7 @@ main { padding: 0 14px; max-width: 720px; margin: 0 auto; }
 .sheet form { display: flex; flex-direction: column; min-height: 0; flex: 1; }
 .sheet-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 6px; gap: 10px; }
 .sheet-head h2 { margin: 0; font-size: 20px; }
-.sheet-body { overflow-y: auto; padding: 6px 16px 12px; -webkit-overflow-scrolling: touch; }
+.sheet-body { overflow-y: auto; overflow-x: hidden; padding: 6px 16px 12px; -webkit-overflow-scrolling: touch; }
 .sheet-foot { display: flex; gap: 10px; padding: 10px 16px calc(12px + var(--safe-b)); border-top: 1px solid var(--line); }
 .sheet-foot .btn { flex: 1; }
 .sheet-foot .btn.danger { flex: 0 0 auto; }
@@ -177,7 +177,7 @@ main { padding: 0 14px; max-width: 720px; margin: 0 auto; }
 .field { display: block; margin: 12px 0; }
 .field > span, .field-label { display: block; color: var(--muted); font-size: 13px; font-weight: 600; margin: 0 2px 6px; }
 .inp, .field input:not([type=radio]):not([type=checkbox]), .field textarea, .field select {
-  width: 100%; min-height: 50px; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface-2); font-size: 16px; outline: none; -webkit-appearance: none; appearance: none;
+  width: 100%; min-width: 0; min-height: 50px; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface-2); font-size: 16px; outline: none; -webkit-appearance: none; appearance: none;
 }
 select.inp, .field select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%239aa0a6' stroke-width='2'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 34px; }
 .inp:focus, .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--accent); }
@@ -185,6 +185,7 @@ select.inp, .field select { background-image: url("data:image/svg+xml,%3Csvg xml
 .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .row3 { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 8px; }
 .row2 .field, .row3 .field { margin: 12px 0; }
+.row2 > *, .row3 > * { min-width: 0; }
 .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 6px; }
 .seg-opt { position: relative; }
 .seg-opt input { position: absolute; opacity: 0; inset: 0; }
@@ -288,6 +289,34 @@ details.help code { background: var(--surface-3); padding: 1px 5px; border-radiu
 .tpl-prev .bt { flex: none; width: 110px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .tpl-prev ul { list-style: none; margin: 0; padding: 0; }
 
+/* Checkliste */
+.cl-list { display: flex; flex-direction: column; gap: 6px; }
+.cl-row { display: flex; align-items: center; gap: 6px; background: var(--surface-2); border-radius: 12px; padding: 2px 2px 2px 4px; }
+.cl-check { position: relative; width: 44px; height: 44px; display: grid; place-items: center; flex: none; }
+.cl-check input { position: absolute; inset: 0; opacity: 0; margin: 0; }
+.cl-check span { width: 24px; height: 24px; border-radius: 7px; border: 2px solid var(--muted); display: grid; place-items: center; }
+.cl-check input:checked + span { background: var(--ok); border-color: var(--ok); }
+.cl-check input:checked + span::after { content: ''; width: 10px; height: 5px; border-left: 2.5px solid var(--accent-ink); border-bottom: 2.5px solid var(--accent-ink); transform: translateY(-2px) rotate(-45deg); }
+.cl-check input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+.cl-text { flex: 1; min-width: 0; min-height: 44px; background: none; border: 0; outline: none; font-size: 16px; padding: 6px 4px; }
+.cl-row.done .cl-text { text-decoration: line-through; color: var(--muted); }
+.cl-row .icon-btn { background: none; color: var(--muted); }
+.cl-series .cl-check { display: none; }
+.cl-series .cl-row { padding-left: 10px; }
+.cl-add { display: flex; gap: 8px; margin-top: 8px; }
+.cl-add .inp { flex: 1; }
+.ok { color: var(--ok) !important; font-weight: 600; }
+
+/* Abend-Check */
+.eve-card { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; background: linear-gradient(140deg, #231a3d, #14171c 70%); border: 1px solid #3d2f66; border-radius: var(--radius); padding: 14px; margin-top: 10px; color: var(--text); min-height: 64px; }
+.eve-card .ec-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.eve-card .ec-sub { color: var(--muted); font-size: 14px; }
+.eve-card > svg.i:first-child { color: var(--lernen); width: 26px; height: 26px; }
+.brief li .bl { display: flex; gap: 10px; flex: 1; min-width: 0; background: none; border: 0; padding: 0; text-align: left; align-items: center; min-height: 36px; }
+.hero .pre { display: block; color: var(--muted); font-size: 14px; margin-top: 2px; }
+#alarm.pre { background: radial-gradient(circle at 50% 30%, #3a2a0e, #0b0d10 70%); }
+#alarm.pre .a-label { color: #ffcf7a; }
+
 /* Mehr */
 .settings .card { margin-bottom: 10px; }
 .settings p { margin: 6px 0; color: var(--muted); font-size: 14px; }
@@ -370,6 +399,7 @@ ul.plain li { margin: 4px 0; }
   <symbol id="i-left" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
   <symbol id="i-right" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
   <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M4 16V5a2 2 0 0 1 2-2h11"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
 </svg>
 
 <script>
@@ -378,7 +408,7 @@ ul.plain li { margin: 4px 0; }
    Kommandozentrum – Phase 2
    Datenhaltung: localStorage (Struktur) + IndexedDB (Anhänge). Nichts verlässt das Gerät.
    ========================================================================== */
-const APP_VERSION = '2.0.0';
+const APP_VERSION = '2.1.0';
 const LS_KEY = 'kz:data:v1';
 const BACKUP_FORMAT = 'kommandozentrum-backup';
 const PBKDF2_ITER = 600000;
@@ -462,10 +492,12 @@ function b64ToBuf(b64) {
 function defaultState() {
   return {
     version: 2, tasks: [], events: [], places: [], routines: [], templates: [], fired: {},
-    settings: { taskCat: 'alle', showDone: false, showPast: false, planMode: 'tag', brief: true, lastBrief: '', lastExport: 0 }
+    settings: { taskCat: 'alle', showDone: false, showPast: false, planMode: 'tag', brief: true, lastBrief: '', lastExport: 0, preAlert: 10, evening: true, eveningTime: '20:00', lastEvening: '', lastEveningNote: '' }
   };
 }
 const cleanId = (v) => (typeof v === 'string' && v ? v.slice(0, 80) : null);
+const cleanChecklist = (cl) => (Array.isArray(cl) ? cl : []).filter((x) => x && typeof x === 'object' && str(x.text).trim()).slice(0, 50)
+  .map((x) => ({ id: cleanId(x.id) || uid(), text: str(x.text, 200).trim(), done: !!x.done }));
 function cleanTask(t) {
   if (!t || typeof t !== 'object' || !cleanId(t.id)) return null;
   const planDate = isDate(t.planDate) ? t.planDate : '';
@@ -476,7 +508,7 @@ function cleanTask(t) {
     due: isDate(t.due) ? t.due : '', dueTime: isDate(t.due) && isTime(t.dueTime) ? t.dueTime : '',
     planDate, planStart, planEnd: planStart && isTime(t.planEnd) && t.planEnd > planStart ? t.planEnd : '',
     notes: str(t.notes), done: !!t.done, doneAt: Number(t.doneAt) || 0, created: Number(t.created) || Date.now(),
-    routineId: cleanId(t.routineId) || '', occDate: isDate(t.occDate) ? t.occDate : ''
+    routineId: cleanId(t.routineId) || '', occDate: isDate(t.occDate) ? t.occDate : '', checklist: cleanChecklist(t.checklist)
   };
 }
 function cleanEvent(e) {
@@ -514,7 +546,8 @@ function cleanRoutine(r) {
     Object.assign(base, {
       prio: PRIO[r.prio] ? r.prio : 'soll', cat: CATS[r.cat] ? r.cat : 'privat', dueTime: isTime(r.dueTime) ? r.dueTime : '',
       planStart, planEnd: planStart && isTime(r.planEnd) && r.planEnd > planStart ? r.planEnd : '',
-      lead: clampInt(r.lead, 0, 365, 0), generatedUntil: isDate(r.generatedUntil) ? r.generatedUntil : ''
+      lead: clampInt(r.lead, 0, 365, 0), generatedUntil: isDate(r.generatedUntil) ? r.generatedUntil : '',
+      checklist: cleanChecklist(r.checklist).map((x) => ({ ...x, done: false }))
     });
   }
   return base;
@@ -548,6 +581,11 @@ function normalize(s) {
   d.settings.brief = st.brief !== false;
   d.settings.lastBrief = isDate(st.lastBrief) ? st.lastBrief : '';
   d.settings.lastExport = Number(st.lastExport) || 0;
+  d.settings.preAlert = clampInt(st.preAlert ?? 10, 0, 120, 10);
+  d.settings.evening = st.evening !== false;
+  d.settings.eveningTime = isTime(st.eveningTime) ? st.eveningTime : '20:00';
+  d.settings.lastEvening = isDate(st.lastEvening) ? st.lastEvening : '';
+  d.settings.lastEveningNote = isDate(st.lastEveningNote) ? st.lastEveningNote : '';
   return d;
 }
 function load() {
@@ -660,7 +698,8 @@ function taskInstance(r, ds) {
   return cleanTask({
     id: uid(), title: r.title, prio: r.prio, cat: r.cat, due: ds, dueTime: r.dueTime,
     planDate: r.planStart ? ds : '', planStart: r.planStart, planEnd: r.planEnd,
-    notes: r.notes, routineId: r.id, occDate: ds, created: Date.now()
+    notes: r.notes, routineId: r.id, occDate: ds, created: Date.now(),
+    checklist: (r.checklist || []).map((x) => ({ id: uid(), text: x.text, done: false }))
   });
 }
 // Legt Aufgaben aus Routinen an: bis „heute + Vorlauf“; verpasste Termine nur den jüngsten.
@@ -730,6 +769,12 @@ function nextDeparture() {
   }
   return best;
 }
+function firstDeparture(ds, notBefore = 0) {
+  let dep = null;
+  for (const ev of eventsOn(ds)) { const la = leaveAt(ev); if (la && la.getTime() > notBefore && (!dep || la < dep.la)) dep = { ev, la }; }
+  return dep;
+}
+const preTime = (la) => new Date(la.getTime() - state.settings.preAlert * 60000);
 // Alles mit Uhrzeit an einem Tag: Termine (inkl. Serien) und eingeplante Aufgaben
 function timedItems(ds) {
   const items = [];
@@ -765,9 +810,13 @@ function taskItem(t) {
     <button class="check" data-act="toggle-task" aria-label="${t.done ? 'Als offen markieren' : 'Als erledigt markieren'}"><span class="box">${t.done ? icon('tick', 'sm') : ''}</span></button>
     <button class="item-main" data-act="edit-task">
       <span class="item-title">${esc(t.title)}</span>
-      <span class="meta">${t.planStart ? `<span class="slot">${icon('cal', 'sm')} ${t.planDate === todayStr() ? '' : esc(fmtDateLabel(t.planDate)) + ' '}${esc(slotLabel(t))}</span>` : ''}<span class="pill prio-${t.prio}">${PRIO[t.prio]}</span><span class="pill cat-${t.cat}">${CATS[t.cat]}</span>${t.due ? `<span class="${od ? 'warn' : ''}">${icon('clock', 'sm')} ${esc(fmtDue(t))}</span>` : ''}${t.routineId ? `<span>${icon('repeat', 'sm')}</span>` : ''}${attBadge(t.id)}</span>
+      <span class="meta">${t.planStart ? `<span class="slot">${icon('cal', 'sm')} ${t.planDate === todayStr() ? '' : esc(fmtDateLabel(t.planDate)) + ' '}${esc(slotLabel(t))}</span>` : ''}<span class="pill prio-${t.prio}">${PRIO[t.prio]}</span><span class="pill cat-${t.cat}">${CATS[t.cat]}</span>${t.due ? `<span class="${od ? 'warn' : ''}">${icon('clock', 'sm')} ${esc(fmtDue(t))}</span>` : ''}${t.checklist.length ? clBadge(t) : ''}${t.routineId ? `<span>${icon('repeat', 'sm')}</span>` : ''}${attBadge(t.id)}</span>
     </button>
   </div>`;
+}
+function clBadge(t) {
+  const n = t.checklist.filter((x) => x.done).length;
+  return `<span class="${n === t.checklist.length ? 'ok' : ''}">${icon('check', 'sm')} ${n}/${t.checklist.length}</span>`;
 }
 function eventItem(ev) {
   const la = leaveAt(ev);
@@ -799,10 +848,12 @@ function renderHeute() {
       <div class="label">${diff <= 0 ? 'Losfahren – jetzt!' : 'Nächster Aufbruch'}</div>
       <div class="big">${fmtTime(nd.la)}</div>
       <div class="rel">${fmtRel(diff)}${nd.ev.date !== t ? ' · ' + esc(fmtDateLabel(nd.ev.date)) : ''}</div>
-      <div class="what"><b>${esc(nd.ev.title)}</b><span class="muted">${esc(nd.ev.start)} · ${esc(nd.ev.location)} · ${nd.ev.buffer} min Puffer</span></div>
+      <div class="what"><b>${esc(nd.ev.title)}</b><span class="muted">${esc(nd.ev.start)} · ${esc(nd.ev.location)} · ${nd.ev.buffer} min Puffer</span>${state.settings.preAlert && preTime(nd.la) > now ? `<span class="pre">Vorwarnung ${fmtTime(preTime(nd.la))} – fertig machen</span>` : ''}</div>
       <a class="btn primary block" href="${esc(mapsUrl(nd.ev.location))}" target="_blank" rel="noopener noreferrer">${icon('nav')} Navigation starten</a>
     </div>`;
   }
+
+  if (eveningActive()) html += `<button class="eve-card" data-act="show-evening">${icon('moon')}<span class="ec-main"><b>Morgen vorbereiten</b><span class="ec-sub">${esc(tomorrowSummary())}</span></span>${icon('right', 'sm')}</button>`;
 
   // Jetzt läuft – mehrere Dinge parallel
   const items = timedItems(t);
@@ -989,17 +1040,20 @@ function renderMehr() {
     </div>
   </section>
 
-  <section class="section"><div class="section-h"><span>Tagesbriefing</span></div>
+  <section class="section"><div class="section-h"><span>Briefing &amp; Abend-Check</span></div>
     <div class="card">
-      <label class="check-row"><input type="checkbox" id="brief-auto"${state.settings.brief ? ' checked' : ''}> Beim ersten Öffnen am Tag automatisch zeigen</label>
-      <button class="btn block" data-act="show-brief">${icon('brief')} Briefing jetzt anzeigen</button>
+      <label class="check-row"><input type="checkbox" id="brief-auto"${state.settings.brief ? ' checked' : ''}> Morgens: Tagesbriefing beim ersten Öffnen</label>
+      <label class="check-row"><input type="checkbox" id="eve-auto"${state.settings.evening ? ' checked' : ''}> Abends: „Morgen vorbereiten“ ab</label>
+      <label class="field" style="margin-top:0"><span>Uhrzeit Abend-Check</span><input type="time" id="eve-time" value="${esc(state.settings.eveningTime)}"></label>
+      <div class="btn-row"><button class="btn" data-act="show-brief">${icon('brief')} Briefing</button><button class="btn" data-act="show-evening">${icon('moon')} Abend-Check</button></div>
     </div>
   </section>
 
   <section class="section"><div class="section-h"><span>Losfahr-Alarm</span></div>
     <div class="card">
       <p>Systembenachrichtigungen: <b>${permTxt}</b></p>
-      <p>Der Alarm löst aus, solange die App geöffnet ist oder im Hintergrund läuft. Für einen garantierten Wecker zusätzlich „In Kalender (.ics)“ im Termin nutzen.</p>
+      <p>Der Alarm löst aus, solange die App geöffnet ist oder im Hintergrund läuft. Für einen garantierten Wecker zusätzlich „In Kalender (.ics)“ im Termin nutzen – die Datei enthält auch die Vorwarnung.</p>
+      <label class="field"><span>Vorwarnung vor dem Losfahren</span><select id="pre-alert">${options({ 0: 'Aus', 5: '5 min vorher', 10: '10 min vorher', 15: '15 min vorher', 20: '20 min vorher', 30: '30 min vorher' }, String(state.settings.preAlert))}</select></label>
       <div class="btn-row" style="margin-top:10px">
         ${perm === 'default' ? `<button class="btn primary" data-act="ask-notify">Benachrichtigungen erlauben</button>` : ''}
         <button class="btn" data-act="test-alarm">Test-Alarm</button>
@@ -1052,6 +1106,9 @@ function renderMehr() {
   enc.onchange = () => { $('#exp-pw').hidden = !enc.checked; };
   $('#imp-file').onchange = (e) => { const f = e.target.files[0]; e.target.value = ''; if (f) importBackup(f); };
   $('#brief-auto').onchange = (e) => { state.settings.brief = e.target.checked; save(); };
+  $('#eve-auto').onchange = (e) => { state.settings.evening = e.target.checked; save(); };
+  $('#eve-time').onchange = (e) => { if (isTime(e.target.value)) { state.settings.eveningTime = e.target.value; state.settings.lastEvening = ''; save(); } };
+  $('#pre-alert').onchange = (e) => { state.settings.preAlert = clampInt(e.target.value, 0, 120, 10); save(); scheduleNextCheck(); };
   renderStorage();
 }
 async function renderStorage() {
@@ -1274,6 +1331,10 @@ function editTask(id, opts = {}) {
         </div>
         <div class="presets" data-due-presets><button type="button" data-d="0">Heute</button><button type="button" data-d="1">Morgen</button><button type="button" data-d="7">+1 Woche</button><button type="button" data-d="">Keine</button></div>
       `}
+      <div class="subhead">Checkliste</div>
+      <div class="cl-list${series ? ' cl-series' : ''}" data-cl></div>
+      <div class="cl-add"><input class="inp" data-cl-new placeholder="Punkt hinzufügen" autocomplete="off" enterkeyhint="enter" maxlength="200" aria-label="Neuer Punkt"><button type="button" class="icon-btn" data-cl-add aria-label="Punkt hinzufügen">${icon('plus')}</button></div>
+      ${series ? '<p class="muted small" style="margin:6px 0 0">Jeder neue Eintrag der Routine startet mit leerer Checkliste.</p>' : ''}
       <div class="subhead">Einplanen (Stundenplan)</div>
       <div class="${series ? 'row2' : 'row3'}">
         ${series ? '' : `<label class="field"><span>Tag</span><input type="date" name="planDate" value="${esc(t.planDate)}"></label>`}
@@ -1288,10 +1349,40 @@ function editTask(id, opts = {}) {
       ${series ? '' : attSection()}
     </div>
     <div class="sheet-foot">${isNew ? '' : `<button type="button" class="btn danger" data-del aria-label="Löschen">${icon('trash')}</button>`}<button type="submit" class="btn primary">Speichern</button></div>
-  </form>`, (saved) => { if (!saved && isNew && added.length) Files.delOwner(t.id).then(refreshAttCounts); });
+  </form>`, (saved) => {
+    if (!saved && isNew && added.length) Files.delOwner(t.id).then(refreshAttCounts);
+    if (!saved && existing) render();   // Checklisten-Haken werden sofort gespeichert
+  });
   const form = sheet.querySelector('form');
   const el = form.elements;
   if (isNew && !pf.title) setTimeout(() => el.title.focus(), 250);
+  // Checkliste
+  const cl = (t.checklist || []).map((x) => ({ ...x }));
+  const clBox = sheet.querySelector('[data-cl]');
+  const clNew = sheet.querySelector('[data-cl-new]');
+  const renderCl = () => {
+    clBox.innerHTML = cl.map((x, i) => `<div class="cl-row${x.done ? ' done' : ''}" data-i="${i}"><label class="cl-check"><input type="checkbox"${x.done ? ' checked' : ''} aria-label="Erledigt"><span></span></label><input class="cl-text" value="${esc(x.text)}" maxlength="200" aria-label="Punkt"><button type="button" class="icon-btn" data-rm aria-label="Punkt entfernen">${icon('trash', 'sm')}</button></div>`).join('');
+  };
+  const addCl = () => { const v = clNew.value.trim(); if (!v) return; cl.push({ id: uid(), text: v, done: false }); clNew.value = ''; renderCl(); clNew.focus(); };
+  clNew.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addCl(); } });
+  sheet.querySelector('[data-cl-add]').onclick = addCl;
+  clBox.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); clNew.focus(); } });
+  clBox.addEventListener('input', (e) => { if (e.target.classList.contains('cl-text')) cl[e.target.closest('.cl-row').dataset.i].text = e.target.value; });
+  clBox.addEventListener('click', (e) => { const b = e.target.closest('[data-rm]'); if (b) { cl.splice(Number(b.closest('.cl-row').dataset.i), 1); renderCl(); } });
+  clBox.addEventListener('change', (e) => {
+    if (e.target.type !== 'checkbox') return;
+    const row = e.target.closest('.cl-row');
+    const item = cl[row.dataset.i];
+    item.done = e.target.checked;
+    row.classList.toggle('done', item.done);
+    if (!existing) return;
+    // Haken sofort speichern – praktisch beim Abarbeiten, auch ohne „Speichern“
+    const stored = state.tasks.find((x) => x.id === existing.id);
+    const si = stored && stored.checklist.find((x) => x.id === item.id);
+    if (si) { si.done = item.done; save(); }
+    if (stored && !stored.done && cl.every((x) => x.done)) toast('Alle Punkte erledigt', { label: 'Aufgabe abhaken', fn: () => { stored.done = true; stored.doneAt = Date.now(); save(); closeSheet(true); render(); } });
+  });
+  renderCl();
   const presets = sheet.querySelector('[data-due-presets]');
   if (presets) presets.onclick = (e) => {
     const b = e.target.closest('button'); if (!b) return;
@@ -1312,7 +1403,8 @@ function editTask(id, opts = {}) {
     const ttl = el.title.value.trim();
     if (!ttl) { el.title.focus(); toast('Bitte einen Titel eingeben'); return; }
     if (el.planStart.value && el.planEnd.value && el.planEnd.value <= el.planStart.value) { toast('„bis“ liegt vor „von“'); return; }
-    const common = { title: ttl, prio: form.querySelector('[name=prio]:checked').value, cat: form.querySelector('[name=cat]:checked').value, notes: el.notes.value.trim(), dueTime: el.dueTime.value, planStart: el.planStart.value, planEnd: el.planEnd.value };
+    if (clNew.value.trim()) addCl();
+    const common = { title: ttl, prio: form.querySelector('[name=prio]:checked').value, cat: form.querySelector('[name=cat]:checked').value, notes: el.notes.value.trim(), dueTime: el.dueTime.value, planStart: el.planStart.value, planEnd: el.planEnd.value, checklist: cl };
     if (series) {
       const startDate = el.startDate.value || routine.startDate;
       const r = cleanRoutine({ ...routine, ...common, startDate, until: el.until.value, rule: readRule(form, startDate), lead: el.lead.value });
@@ -1422,7 +1514,7 @@ function editEvent(id, opts = {}) {
     const c = current();
     const la = c && leaveAt(c);
     const repeating = series || (showRule && el.freq.value !== 'none');
-    leaveEl.innerHTML = la ? `${icon('car', 'sm')} Losfahren ${repeating ? 'jeweils ' : ''}um <b>${fmtTime(la)}</b>${repeating ? '' : ` (${esc(fmtDateLabel(c.date))})`}`
+    leaveEl.innerHTML = la ? `${icon('car', 'sm')} Losfahren ${repeating ? 'jeweils ' : ''}um <b>${fmtTime(la)}</b>${repeating ? '' : ` (${esc(fmtDateLabel(c.date))})`}${state.settings.preAlert && el.alarm.checked ? ` · Vorwarnung ${fmtTime(preTime(la))}` : ''}`
       : (loc ? 'Beginn eintragen, um die Losfahrzeit zu berechnen.' : 'Ort eintragen, um Navigation und Losfahr-Alarm zu nutzen.');
     if (navA) { navA.hidden = !loc; if (loc) navA.href = mapsUrl(loc); }
   }
@@ -1697,7 +1789,7 @@ const WD_RE = '(?:montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag|mo
 const wdNum = (w) => WD_WORDS[String(w).toLowerCase().replace('.', '')] ?? null;
 function parseQuick(input) {
   const today = todayStr();
-  const r = { title: '', date: '', start: '', end: '', dueTime: '', location: '', buffer: null, prio: '', cat: '', rule: null, due: false, timed: false };
+  const r = { title: '', date: '', start: '', end: '', dueTime: '', location: '', buffer: null, prio: '', cat: '', rule: null, due: false, timed: false, checklist: [] };
   let s = ' ' + String(input || '').replace(/\s+/g, ' ').trim() + ' ';
   const take = (re, fn) => { s = s.replace(re, (...m) => { const keep = fn(...m); return keep == null ? ' ' : keep; }); };
   const okT = (h, m) => h >= 0 && h <= 23 && m >= 0 && m <= 59;
@@ -1762,8 +1854,11 @@ function parseQuick(input) {
   // „bis morgen 12 Uhr“: die Uhrzeit gehört zur Frist
   if (r.due && r.start && !r.end && !r.dueTime) { r.dueTime = r.start; r.start = ''; r.timed = false; }
   r.title = s.replace(/\s+/g, ' ').replace(/^[\s,;:–-]+|[\s,;:–-]+$/g, '').trim();
-  // Priorität, Kategorie oder Frist → Aufgabe; Uhrzeit oder Ort → Termin
-  r.type = !r.prio && !r.cat && !r.due && (r.timed || r.location) ? 'event' : 'task';
+  // „Tasche packen: Ausweis, Laptop, Ladekabel“ → Checkliste
+  const clm = r.title.match(/^(.+?):\s*(.+,.+)$/);
+  if (clm) { r.title = clm[1].trim(); r.checklist = clm[2].split(/\s*,\s*/).map((x) => x.trim()).filter(Boolean).slice(0, 50); }
+  // Priorität, Kategorie, Frist oder Checkliste → Aufgabe; Uhrzeit oder Ort → Termin
+  r.type = !r.prio && !r.cat && !r.due && !r.checklist.length && (r.timed || r.location) ? 'event' : 'task';
   return r;
 }
 function quickToEvent(p, baseDate) {
@@ -1775,7 +1870,7 @@ function quickToEvent(p, baseDate) {
 }
 function quickToTask(p, baseDate) {
   const t = todayStr();
-  const o = { title: p.title, prio: p.prio || 'soll', cat: p.cat || defaultCat(), due: '', dueTime: '', planDate: '', planStart: '', planEnd: '', notes: '' };
+  const o = { title: p.title, prio: p.prio || 'soll', cat: p.cat || defaultCat(), due: '', dueTime: '', planDate: '', planStart: '', planEnd: '', notes: '', checklist: (p.checklist || []).map((text) => ({ id: uid(), text, done: false })) };
   if (p.due) { o.due = p.date || t; o.dueTime = p.dueTime; }
   else if (p.date && !p.timed) o.due = p.date;
   if (p.timed) { o.planDate = p.due ? baseDate || t : p.date || baseDate || t; o.planStart = p.start; o.planEnd = p.end && p.end > p.start ? p.end : ''; }
@@ -1796,6 +1891,7 @@ function quickPreview(p, type, baseDate) {
     parts.push(`<span class="pill prio-${o.prio}">${PRIO[o.prio]}</span>`, `<span class="pill cat-${o.cat}">${CATS[o.cat]}</span>`);
     if (o.due) parts.push(`${icon('clock', 'sm')} Frist ${esc(fmtDateLabel(o.due))}${o.dueTime ? ' ' + esc(o.dueTime) : ''}`);
     if (o.planStart) parts.push(`${icon('cal', 'sm')} eingeplant ${esc(fmtDateLabel(o.planDate))} ${esc(o.planStart)}${o.planEnd ? '–' + esc(o.planEnd) : ''}`);
+    if (o.checklist.length) parts.push(`${icon('check', 'sm')} Checkliste: ${o.checklist.map((x) => esc(x.text)).join(', ')}`);
   }
   if (p.rule) parts.push(`${icon('repeat', 'sm')} ${esc(ruleText(cleanRoutine({ id: 'x', kind: type, startDate: p.date || baseDate || todayStr(), rule: p.rule })))}`);
   return `<div class="qp-title">${type === 'event' ? (p.rule ? 'Termin-Serie' : 'Termin') : (p.rule ? 'Aufgaben-Routine' : 'Aufgabe')}: ${esc(p.title)}</div><div class="qp-line">${parts.map((x) => `<span>${x}</span>`).join('')}</div>`;
@@ -1841,6 +1937,7 @@ function quickEntry(opts = {}) {
         <li>Ort (am Ende): <code>@Schule</code> · Fahrzeit: <code>+20</code></li>
         <li>Priorität: <code>!muss</code> <code>!soll</code> <code>!kann</code> (oder <code>!</code> = Muss) · Kategorie: <code>#dienst</code> <code>#lernen</code> <code>#training</code> <code>#privat</code></li>
         <li>Frist: <code>bis Fr</code> · Wiederholung: <code>täglich</code> <code>werktags</code> <code>jeden Di und Do</code> <code>monatlich</code></li>
+        <li>Checkliste: <code>Tasche packen: Ausweis, Laptop, Ladekabel</code></li>
         <li>Beispiele: <code>werktags 7:30-16:00 Unterricht @Schule</code> · <code>Bericht abgeben bis Fr !muss #dienst</code> · <code>morgen 12-12:30 Mails beantworten #dienst</code></li>
       </ul></details>
       <div class="btn-row">
@@ -1901,14 +1998,13 @@ function briefHtml(ds) {
   const overdue = open.filter(isOverdue);
   const dueToday = open.filter((t) => t.due === ds && !isOverdue(t));
   const mussOpen = open.filter((t) => t.prio === 'muss');
-  let dep = null;
-  for (const ev of evs) { const la = leaveAt(ev); if (la && (!isToday || la > Date.now() - 30 * 60000) && (!dep || la < dep.la)) dep = { ev, la }; }
+  const dep = firstDeparture(ds, isToday ? Date.now() - 30 * 60000 : 0);
   let html = `<div class="brief"><div class="kpis">
     <div class="kpi"><b>${evs.length}</b><span>Termine</span></div>
     <div class="kpi"><b>${dueToday.length}</b><span>fällig</span></div>
     <div class="kpi${overdue.length ? ' alert' : ''}"><b>${overdue.length}</b><span>überfällig</span></div>
     <div class="kpi"><b>${mussOpen.length}</b><span>Muss offen</span></div></div>`;
-  if (dep) html += `<h4>Aufbruch</h4><ul><li><span class="bt"><b>${fmtTime(dep.la)}</b></span><span class="bx">→ ${esc(dep.ev.title)}${dep.ev.location ? ' · ' + esc(dep.ev.location) : ''}</span></li></ul>`;
+  if (dep) html += `<h4>Aufbruch</h4><ul>${state.settings.preAlert ? `<li><span class="bt">${fmtTime(preTime(dep.la))}</span><span class="bx muted">Vorwarnung – fertig machen</span></li>` : ''}<li><span class="bt"><b>${fmtTime(dep.la)}</b></span><span class="bx">→ ${esc(dep.ev.title)}${dep.ev.location ? ' · ' + esc(dep.ev.location) : ''}</span></li></ul>`;
   html += `<h4>Ablauf</h4>`;
   const rows = [...allDay.map((e) => `<li><span class="bt">ganztägig</span><span class="bx">${esc(e.title)}</span></li>`),
     ...items.slice(0, 10).map((it) => `<li><span class="bt">${esc(it.label)}</span><span class="bx">${it.kind === 'task' ? '☐ ' : ''}${esc(it.ref.title)}${isToday && it.s <= nm && nm < it.e ? ' <span class="leave">· läuft</span>' : ''}</span></li>`)];
@@ -1934,9 +2030,96 @@ function showBrief() {
 function maybeBrief() {
   const t = todayStr();
   if (!state.settings.brief || state.settings.lastBrief === t || new Date().getHours() < 4) return;
+  if (eveningActive()) { state.settings.lastBrief = t; save(); return; }   // abends übernimmt der Abend-Check
   if (!sheetRoot.hidden || !$('#alarm').hidden) return;
   state.settings.lastBrief = t; save();
   if (state.tasks.length + state.events.length + state.routines.length) showBrief();
+}
+
+/* ---------- Abend-Check: Morgen vorbereiten ---------- */
+const eveningActive = () => state.settings.evening && nowMin() >= toMin(state.settings.eveningTime);
+// Offene Aufgaben bis heute, die sich auf morgen schieben lassen (Routinen, die morgen ohnehin wiederkommen, nicht)
+function movableToTomorrow() {
+  const t = todayStr(), tm = addDays(t, 1);
+  return state.tasks.filter((x) => {
+    if (x.done || !x.due || x.due > t) return false;
+    const r = x.routineId && state.routines.find((y) => y.id === x.routineId);
+    return !(r && ruleMatches(r, tm));
+  });
+}
+function tomorrowSummary() {
+  const tm = addDays(todayStr(), 1);
+  const first = eventsOn(tm).find((e) => e.start);
+  const dep = firstDeparture(tm);
+  const prep = state.tasks.filter((x) => !x.done && (x.due === tm || x.planDate === tm)).length;
+  const parts = [];
+  if (first) parts.push(`1. Termin ${first.start} ${first.title}`);
+  if (dep) parts.push(`los ${fmtTime(dep.la)}`);
+  if (prep) parts.push(`${prep} vorzubereiten`);
+  return parts.join(' · ') || 'Morgen ist noch nichts geplant';
+}
+function eveningHtml() {
+  const t = todayStr(), tm = addDays(t, 1);
+  const evs = eventsOn(tm);
+  const items = timedItems(tm).filter((it) => !(it.kind === 'task' && it.ref.done));
+  const allDay = evs.filter((e) => !e.start);
+  const open = state.tasks.filter((x) => !x.done);
+  const prep = open.filter((x) => x.due === tm || x.planDate === tm).sort(byTaskOrder);
+  const leftToday = open.filter((x) => x.due && x.due <= t).sort(byTaskOrder);
+  const dep = firstDeparture(tm);
+  const taskRow = (x) => `<li><button type="button" class="bl" data-open-task="${esc(x.id)}"><span class="bt"><span class="pill prio-${x.prio}">${PRIO[x.prio]}</span></span><span class="bx">${esc(x.title)}${x.checklist.length ? ` <span class="${x.checklist.every((c) => c.done) ? 'ok' : 'muted'}">· ${x.checklist.filter((c) => c.done).length}/${x.checklist.length}</span>` : ''}${x.due && x.due < t ? ' <span class="warn">· überfällig</span>' : ''}</span></button></li>`;
+  let html = `<div class="brief"><div class="kpis">
+    <div class="kpi"><b>${evs.length}</b><span>Termine</span></div>
+    <div class="kpi"><b>${prep.length}</b><span>vorbereiten</span></div>
+    <div class="kpi${leftToday.length ? ' alert' : ''}"><b>${leftToday.length}</b><span>heute offen</span></div>
+    <div class="kpi"><b>${open.filter((x) => x.prio === 'muss').length}</b><span>Muss offen</span></div></div>`;
+  if (dep) html += `<h4>Aufbruch morgen</h4><ul>${state.settings.preAlert ? `<li><span class="bt">${fmtTime(preTime(dep.la))}</span><span class="bx muted">Vorwarnung – fertig machen</span></li>` : ''}<li><span class="bt"><b>${fmtTime(dep.la)}</b></span><span class="bx">→ ${esc(dep.ev.title)}${dep.ev.location ? ' · ' + esc(dep.ev.location) : ''}</span></li></ul>`;
+  html += `<h4>Ablauf morgen</h4>`;
+  const rows = [...allDay.map((e) => `<li><span class="bt">ganztägig</span><span class="bx">${esc(e.title)}</span></li>`),
+    ...items.slice(0, 10).map((it) => `<li><span class="bt">${esc(it.label)}</span><span class="bx">${it.kind === 'task' ? '☐ ' : ''}${esc(it.ref.title)}</span></li>`)];
+  html += rows.length ? `<ul>${rows.join('')}</ul>` : `<p class="muted">Keine festen Termine.</p>`;
+  html += `<h4>Vorbereiten</h4>`;
+  html += prep.length ? `<ul>${prep.slice(0, 8).map(taskRow).join('')}</ul>` : `<p class="muted">Für morgen ist nichts fällig.</p>`;
+  if (leftToday.length) {
+    const nMove = movableToTomorrow().length;
+    html += `<h4>Heute noch offen</h4><ul>${leftToday.slice(0, 6).map(taskRow).join('')}</ul>${leftToday.length > 6 ? `<p class="muted small">+${leftToday.length - 6} weitere</p>` : ''}
+      ${nMove ? `<button type="button" class="btn block" style="margin-top:8px" data-move>${icon('right', 'sm')} ${nMove === 1 ? 'Auf morgen verschieben' : `${nMove} Aufgaben auf morgen verschieben`}</button>` : ''}
+      ${nMove < leftToday.length ? `<p class="muted small">Routine-Aufgaben, die morgen ohnehin wiederkommen, bleiben stehen.</p>` : ''}`;
+  }
+  return html + '</div>';
+}
+function showEvening() {
+  const sheet = openSheet(`${sheetHead('Morgen vorbereiten')}<div class="sheet-body"><p class="muted" style="margin:0 0 8px">${esc(fmtLong(addDays(todayStr(), 1)))}</p>${eveningHtml()}</div>
+    <div class="sheet-foot"><button type="button" class="btn primary" data-go>Fertig – gute Nacht</button></div>`);
+  sheet.querySelector('[data-go]').onclick = () => closeSheet();
+  sheet.querySelector('.sheet-body').onclick = (e) => {
+    const o = e.target.closest('[data-open-task]');
+    if (o) { editTask(o.dataset.openTask); return; }
+    if (e.target.closest('[data-move]')) {
+      const tm = addDays(todayStr(), 1);
+      const moved = movableToTomorrow();
+      for (const x of moved) x.due = tm;
+      save(); render(); showEvening();
+      toast(`${moved.length} Aufgabe${moved.length > 1 ? 'n' : ''} auf morgen verschoben`);
+    }
+  };
+}
+function maybeEvening() {
+  const t = todayStr();
+  const st = state.settings;
+  if (!st.evening || st.lastEvening === t || !eveningActive()) return;
+  if (!(state.tasks.length + state.events.length + state.routines.length)) return;
+  if (document.hidden) {
+    // App läuft im Hintergrund: einmal per Systembenachrichtigung erinnern
+    if (st.lastEveningNote !== t && 'Notification' in window && Notification.permission === 'granted' && navigator.serviceWorker) {
+      st.lastEveningNote = t; save();
+      navigator.serviceWorker.ready.then((reg) => reg.showNotification('Abend-Check: Morgen vorbereiten', { body: tomorrowSummary(), tag: 'kz-evening', icon: 'icons/icon-192.png', badge: 'icons/icon-192.png' })).catch(() => {});
+    }
+    return;
+  }
+  if (!sheetRoot.hidden || !$('#alarm').hidden) return;
+  st.lastEvening = t; save();
+  showEvening();
 }
 
 /* ---------- Kalenderdatei (.ics, lokal erzeugt) ---------- */
@@ -1958,6 +2141,8 @@ function buildIcs(ev) {
   if (ev.location) lines.push(`LOCATION:${icsEsc((findPlace(ev.location) || {}).address || ev.location)}`);
   if (ev.notes) lines.push(`DESCRIPTION:${icsEsc(ev.notes)}`);
   if (s && ev.location && ev.alarm) {
+    const pre = state.settings.preAlert;
+    if (pre) lines.push('BEGIN:VALARM', 'ACTION:DISPLAY', `DESCRIPTION:${icsEsc(`In ${pre} min losfahren: ${ev.title}`)}`, `TRIGGER:-PT${ev.buffer + pre}M`, 'END:VALARM');
     lines.push('BEGIN:VALARM', 'ACTION:DISPLAY', `DESCRIPTION:${icsEsc('Losfahren: ' + ev.title)}`, `TRIGGER:-PT${ev.buffer}M`, 'END:VALARM');
   }
   lines.push('END:VEVENT', 'END:VCALENDAR');
@@ -1968,16 +2153,17 @@ function buildIcs(ev) {
 /* ---------- Losfahr-Alarm ---------- */
 function checkAlarms() {
   const now = Date.now();
+  const pre = state.settings.preAlert * 60000;
   let changed = false;
   for (const ev of alarmCandidates()) {
     if (!ev.alarm) continue;
     const la = leaveAt(ev); if (!la) continue;
-    const key = String(la.getTime());
-    if (state.fired[ev.id] === key) continue;
-    const diff = now - la.getTime();
-    if (diff >= 0 && diff < ALARM_WINDOW_MIN * 60000) {
-      state.fired[ev.id] = key; changed = true;
-      fireAlarm(ev, la);
+    const t = la.getTime();
+    const key = String(t);
+    if (now >= t) {
+      if (state.fired[ev.id] !== key && now - t < ALARM_WINDOW_MIN * 60000) { state.fired[ev.id] = key; changed = true; fireAlarm(ev, la); }
+    } else if (pre && now >= t - pre && state.fired[ev.id + '#pre'] !== key) {
+      state.fired[ev.id + '#pre'] = key; changed = true; fireAlarm(ev, la, 'pre');
     }
   }
   // Einträge älter als 3 Tage aufräumen
@@ -1992,16 +2178,17 @@ function scheduleNextCheck() {
   let next = Infinity;
   for (const ev of alarmCandidates()) {
     if (!ev.alarm) continue;
-    const la = leaveAt(ev);
-    if (la && la.getTime() > now) next = Math.min(next, la.getTime());
+    const la = leaveAt(ev); if (!la) continue;
+    const t = la.getTime(), p = t - state.settings.preAlert * 60000;
+    if (p > now) next = Math.min(next, p); else if (t > now) next = Math.min(next, t);
   }
   if (next !== Infinity) alarmTimer = setTimeout(checkAlarms, Math.min(next - now + 200, 2 ** 31 - 1));
 }
-function beep() {
+function beep(short) {
   try {
     const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
     const ctx = new AC();
-    [0, 0.35, 0.7, 1.4, 1.75, 2.1].forEach((t) => {
+    (short ? [0, 0.35] : [0, 0.35, 0.7, 1.4, 1.75, 2.1]).forEach((t) => {
       const o = ctx.createOscillator(), g = ctx.createGain();
       o.frequency.value = 880; o.type = 'square';
       g.gain.setValueAtTime(0.0001, ctx.currentTime + t);
@@ -2012,10 +2199,12 @@ function beep() {
     setTimeout(() => ctx.close(), 3000);
   } catch (_) {}
 }
-function fireAlarm(ev, la, test = false) {
-  const late = Date.now() - la.getTime() > 2 * 60000;
+function fireAlarm(ev, la, mode = 'main') {
+  const isPre = mode === 'pre';
+  const late = mode === 'main' && Date.now() - la.getTime() > 2 * 60000;
   const el = $('#alarm');
-  el.innerHTML = `<div class="a-label">${test ? 'Test-Alarm' : late ? 'Aufbruch verpasst' : 'Jetzt losfahren'}</div>
+  el.classList.toggle('pre', isPre);
+  el.innerHTML = `<div class="a-label">${mode === 'test' ? 'Test-Alarm' : isPre ? `Fertig machen · losfahren ${fmtRel(la - Date.now())}` : late ? 'Aufbruch verpasst' : 'Jetzt losfahren'}</div>
     <div class="a-time">${fmtTime(la)}</div>
     <div class="a-title">${esc(ev.title)}</div>
     <div class="a-loc">${esc(ev.location)} · Beginn ${esc(ev.start)} · ${ev.buffer} min Puffer</div>
@@ -2023,11 +2212,11 @@ function fireAlarm(ev, la, test = false) {
     <button class="btn block" data-a="close">Schließen</button>`;
   el.hidden = false;
   el.onclick = (e) => { const b = e.target.closest('[data-a]'); if (b) { el.hidden = true; render(); } };
-  beep();
-  if (navigator.vibrate) navigator.vibrate([400, 200, 400, 200, 800]);
+  beep(isPre);
+  if (navigator.vibrate) navigator.vibrate(isPre ? [300, 150, 300] : [400, 200, 400, 200, 800]);
   if ('Notification' in window && Notification.permission === 'granted' && navigator.serviceWorker) {
-    navigator.serviceWorker.ready.then((reg) => reg.showNotification(`Losfahren: ${ev.title}`, {
-      body: `${fmtTime(la)} · ${ev.location} · Beginn ${ev.start}`, tag: 'kz-' + ev.id, renotify: true, requireInteraction: true, icon: 'icons/icon-192.png', badge: 'icons/icon-192.png'
+    navigator.serviceWorker.ready.then((reg) => reg.showNotification(isPre ? `Fertig machen: ${ev.title}` : `Losfahren: ${ev.title}`, {
+      body: `${isPre ? 'Losfahren um ' : ''}${fmtTime(la)} · ${ev.location} · Beginn ${ev.start}`, tag: (isPre ? 'kz-pre-' : 'kz-') + ev.id, renotify: true, requireInteraction: !isPre, icon: 'icons/icon-192.png', badge: 'icons/icon-192.png'
     })).catch(() => {});
   }
 }
@@ -2184,10 +2373,11 @@ main.addEventListener('click', (e) => {
     case 'apply-template': applyTemplate(b.dataset.id); break;
     case 'example-templates': state.templates.push(...EXAMPLE_TEMPLATES.map((t) => cleanTemplate({ ...t, id: uid() }))); save(); render(); toast('3 Beispielvorlagen geladen'); break;
     case 'show-brief': showBrief(); break;
+    case 'show-evening': showEvening(); break;
     case 'edit-place': editPlace(b.dataset.id); break;
     case 'new-place': editPlace(null); break;
     case 'ask-notify': askNotify(); break;
-    case 'test-alarm': fireAlarm({ title: 'Test-Termin', location: 'Beispielort', start: fmtTime(new Date(Date.now() + 1800000)), buffer: 30 }, new Date(), true); break;
+    case 'test-alarm': fireAlarm({ title: 'Test-Termin', location: 'Beispielort', start: fmtTime(new Date(Date.now() + 1800000)), buffer: 30 }, new Date(), 'test'); break;
     case 'export': exportBackup(); break;
     case 'wipe': wipeAll(); break;
     case 'persist': navigator.storage?.persist?.().then((ok) => { toast(ok ? 'Dauerhafter Speicher aktiv' : 'Vom Browser abgelehnt'); renderStorage(); }); break;
@@ -2204,6 +2394,7 @@ function onTick(force) {
   if (t !== lastDay) { lastDay = t; if (planDate < t) planDate = t; generateRoutineTasks(); force = true; }
   checkAlarms();
   maybeBrief();
+  maybeEvening();
   if (sheetRoot.hidden && (force || view === 'heute' || view === 'plan')) render();
 }
 document.addEventListener('visibilitychange', () => { if (!document.hidden) onTick(true); });
@@ -2232,6 +2423,7 @@ render();
 refreshAttCounts().then(() => { if (sheetRoot.hidden) render(); });
 checkAlarms();
 maybeBrief();
+maybeEvening();
 </script>
 </body>
 </html>
