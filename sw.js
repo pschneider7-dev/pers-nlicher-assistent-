@@ -2,7 +2,7 @@
  * Cacht ausschließlich die eigenen App-Dateien (keine Nutzerdaten).
  * Bei jeder Änderung an index.html o. Ä. CACHE_VERSION erhöhen. */
 'use strict';
-const CACHE_VERSION = 'kz-v2.2.1';
+const CACHE_VERSION = 'kz-v2.3.0';
 const ASSETS = [
   './',
   './index.html',
