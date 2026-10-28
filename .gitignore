@@ -1,0 +1,9 @@
+# Schutz vor versehentlichem Hochladen persönlicher Daten ins öffentliche Repo
+kommandozentrum-backup-*.json
+*-backup*.json
+*.ics
+*.pdf
+*.docx
+*.xlsx
+.DS_Store
+Thumbs.db

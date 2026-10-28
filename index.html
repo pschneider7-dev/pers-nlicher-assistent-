@@ -1,0 +1,1270 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- Datenschutz: connect-src 'none' verhindert jede Netzwerkanfrage aus der Seite (kein fetch/XHR/Beacon/WebSocket).
+     Keine externen Skripte, Schriften oder Bilder. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; frame-src blob:; object-src 'none'; connect-src 'none'; font-src 'none'; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0b0d10">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Kommando">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<title>Kommandozentrum</title>
+<style>
+:root {
+  --bg: #0b0d10;
+  --surface: #14171c;
+  --surface-2: #1c2027;
+  --surface-3: #262b34;
+  --line: #2a2f38;
+  --text: #e8eaed;
+  --muted: #9aa0a6;
+  --accent: #4f9cff;
+  --accent-ink: #06121f;
+  --muss: #ff5d5d;
+  --soll: #ffb547;
+  --kann: #7aa2c8;
+  --dienst: #4f9cff;
+  --lernen: #b48cff;
+  --training: #3ddc97;
+  --privat: #ff7ab6;
+  --ok: #3ddc97;
+  --warn: #ff5d5d;
+  --radius: 16px;
+  --tabbar-h: 64px;
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-t: env(safe-area-inset-top, 0px);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; background: var(--bg); color: var(--text); }
+body {
+  font: 16px/1.4 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, sans-serif;
+  min-height: 100vh;
+  padding-bottom: calc(var(--tabbar-h) + var(--safe-b) + 88px);
+  overscroll-behavior-y: contain;
+}
+body.noscroll { overflow: hidden; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+a { color: var(--accent); }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); border: 0; }
+svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+svg.i.sm { width: 16px; height: 16px; }
+
+/* Kopf */
+.top {
+  position: sticky; top: 0; z-index: 5;
+  padding: calc(var(--safe-t) + 14px) 18px 12px;
+  background: linear-gradient(var(--bg) 75%, rgba(11,13,16,0));
+}
+.top h1 { margin: 0; font-size: 28px; letter-spacing: -0.02em; }
+.top .sub { color: var(--muted); font-size: 15px; margin-top: 2px; }
+main { padding: 0 14px; max-width: 720px; margin: 0 auto; }
+
+/* Karten & Abschnitte */
+.section { margin: 18px 0 8px; }
+.section-h { display: flex; align-items: center; justify-content: space-between; margin: 0 4px 8px; color: var(--muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+.section-h .count { background: var(--surface-2); border-radius: 10px; padding: 1px 8px; font-weight: 600; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; }
+.list { display: flex; flex-direction: column; gap: 8px; }
+.empty { color: var(--muted); padding: 14px; text-align: center; border: 1px dashed var(--line); border-radius: var(--radius); font-size: 15px; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+
+/* Aufbruch-Karte */
+.hero { background: linear-gradient(140deg, #13253f, #14171c 70%); border: 1px solid #22406a; border-radius: 20px; padding: 16px; }
+.hero.urgent { background: linear-gradient(140deg, #4a1717, #14171c 70%); border-color: #7a2a2a; }
+.hero .label { color: var(--muted); font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+.hero .big { font-size: 40px; font-weight: 700; letter-spacing: -0.02em; margin: 2px 0; font-variant-numeric: tabular-nums; }
+.hero .rel { font-size: 17px; font-weight: 600; color: var(--accent); }
+.hero.urgent .rel { color: #ff9b9b; }
+.hero .what { margin: 8px 0 12px; }
+.hero .what b { display: block; font-size: 17px; }
+
+/* Einträge */
+.item { display: flex; align-items: stretch; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; min-height: 60px; overflow: hidden; }
+.item .item-main { flex: 1; min-width: 0; padding: 10px 4px 10px 0; display: flex; flex-direction: column; justify-content: center; background: none; border: 0; text-align: left; }
+.item .item-title { font-size: 16px; font-weight: 600; overflow-wrap: anywhere; }
+.item .meta { display: flex; flex-wrap: wrap; gap: 6px 10px; margin-top: 4px; color: var(--muted); font-size: 13px; align-items: center; }
+.item .meta span { display: inline-flex; align-items: center; gap: 4px; }
+.item.done .item-title { text-decoration: line-through; color: var(--muted); }
+.item.task { border-left: 4px solid var(--kann); }
+.item.task.prio-muss { border-left-color: var(--muss); }
+.item.task.prio-soll { border-left-color: var(--soll); }
+.item.done { opacity: 0.6; }
+.check { flex: none; width: 52px; display: grid; place-items: center; background: none; border: 0; padding: 0; }
+.check .box { width: 28px; height: 28px; border-radius: 9px; border: 2px solid var(--muted); display: grid; place-items: center; color: var(--accent-ink); }
+.item.done .check .box { background: var(--ok); border-color: var(--ok); }
+.pill { border-radius: 8px; padding: 1px 7px; font-size: 12px; font-weight: 600; background: var(--surface-2); color: var(--text); }
+.pill.prio-muss { color: var(--muss); } .pill.prio-soll { color: var(--soll); } .pill.prio-kann { color: var(--kann); }
+.pill.cat-dienst { color: var(--dienst); } .pill.cat-lernen { color: var(--lernen); } .pill.cat-training { color: var(--training); } .pill.cat-privat { color: var(--privat); }
+.warn { color: var(--warn) !important; font-weight: 600; }
+.leave { color: var(--accent) !important; font-weight: 600; }
+.time-col { flex: none; width: 64px; padding: 10px 0 10px 12px; display: flex; flex-direction: column; justify-content: center; font-variant-numeric: tabular-nums; }
+.time-col .t-start { font-weight: 700; font-size: 16px; }
+.time-col .t-end { color: var(--muted); font-size: 13px; }
+.nav-btn { flex: none; width: 56px; display: grid; place-items: center; background: var(--surface-2); color: var(--accent); border: 0; border-left: 1px solid var(--line); text-decoration: none; }
+.item.past { opacity: 0.55; }
+
+/* Chips */
+.chips { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 8px; margin: 0 -2px; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.chip { flex: none; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 9px 14px; font-size: 15px; font-weight: 600; min-height: 42px; }
+.chip.on { background: var(--text); color: var(--bg); border-color: var(--text); }
+.toggle-row { display: flex; justify-content: flex-end; margin: 4px 0; }
+.link-btn { background: none; border: 0; color: var(--accent); padding: 10px 6px; font-size: 15px; font-weight: 600; }
+
+/* Buttons */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 50px; padding: 0 18px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface-2); font-weight: 600; font-size: 16px; text-decoration: none; color: var(--text); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn.danger { color: var(--warn); }
+.btn.block { width: 100%; }
+.btn:disabled { opacity: 0.5; }
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn-row .btn { flex: 1; }
+.btn-row.stack { flex-direction: column; }
+.icon-btn { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 12px; border: 0; background: var(--surface-2); color: var(--text); flex: none; }
+
+/* FAB & Tabs */
+.fab { position: fixed; right: 18px; bottom: calc(var(--tabbar-h) + var(--safe-b) + 16px); width: 62px; height: 62px; border-radius: 20px; background: var(--accent); color: var(--accent-ink); border: 0; display: grid; place-items: center; box-shadow: 0 8px 24px rgba(0,0,0,0.5); z-index: 6; }
+.fab svg.i { width: 30px; height: 30px; stroke-width: 2.6; }
+.fab[hidden] { display: none; }
+.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; display: grid; grid-template-columns: repeat(4, 1fr); background: rgba(16,18,22,0.96); border-top: 1px solid var(--line); padding-bottom: var(--safe-b); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+.tabs button { height: var(--tabbar-h); background: none; border: 0; color: var(--muted); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 12px; font-weight: 600; position: relative; }
+.tabs button.on { color: var(--text); }
+.tabs button.on svg { color: var(--accent); }
+.tabs .badge { position: absolute; top: 8px; left: calc(50% + 8px); background: var(--muss); color: #fff; border-radius: 9px; font-size: 11px; min-width: 18px; height: 18px; padding: 0 5px; display: grid; place-items: center; }
+
+/* Sheets */
+#sheet-root[hidden] { display: none; }
+.backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 20; animation: fade .15s ease-out; }
+.sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 21; max-height: 92vh; max-height: 92dvh; display: flex; flex-direction: column; background: var(--surface); border-radius: 22px 22px 0 0; border-top: 1px solid var(--line); animation: up .2s ease-out; max-width: 720px; margin: 0 auto; }
+.sheet form { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+.sheet-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 6px; }
+.sheet-head h2 { margin: 0; font-size: 20px; }
+.sheet-body { overflow-y: auto; padding: 6px 16px 12px; -webkit-overflow-scrolling: touch; }
+.sheet-foot { display: flex; gap: 10px; padding: 10px 16px calc(12px + var(--safe-b)); border-top: 1px solid var(--line); }
+.sheet-foot .btn { flex: 1; }
+.sheet-foot .btn.danger { flex: 0 0 auto; }
+@keyframes up { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+
+/* Formulare */
+.field { display: block; margin: 12px 0; }
+.field > span, .field-label { display: block; color: var(--muted); font-size: 13px; font-weight: 600; margin: 0 2px 6px; }
+.field input:not([type=radio]):not([type=checkbox]), .field textarea, .field select {
+  width: 100%; min-height: 50px; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface-2); font-size: 16px; outline: none; -webkit-appearance: none; appearance: none;
+}
+.field input:focus, .field textarea:focus { border-color: var(--accent); }
+.field textarea { resize: vertical; min-height: 80px; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.row2 .field { margin: 12px 0; }
+.seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 6px; }
+.seg-opt { position: relative; }
+.seg-opt input { position: absolute; opacity: 0; inset: 0; }
+.seg-opt span { display: grid; place-items: center; min-height: 46px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--line); font-weight: 600; font-size: 15px; color: var(--muted); }
+.seg-opt input:checked + span { color: var(--bg); background: var(--text); border-color: var(--text); }
+.seg-opt.prio-muss input:checked + span { background: var(--muss); border-color: var(--muss); }
+.seg-opt.prio-soll input:checked + span { background: var(--soll); border-color: var(--soll); }
+.seg-opt.prio-kann input:checked + span { background: var(--kann); border-color: var(--kann); }
+.seg-opt.cat-dienst input:checked + span { background: var(--dienst); border-color: var(--dienst); }
+.seg-opt.cat-lernen input:checked + span { background: var(--lernen); border-color: var(--lernen); }
+.seg-opt.cat-training input:checked + span { background: var(--training); border-color: var(--training); }
+.seg-opt.cat-privat input:checked + span { background: var(--privat); border-color: var(--privat); }
+.seg-opt input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+.presets { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.presets button { min-height: 38px; min-width: 50px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface-2); font-weight: 600; font-size: 14px; }
+.check-row { display: flex; align-items: center; gap: 12px; min-height: 48px; margin: 6px 0; font-size: 15px; }
+.check-row input { width: 24px; height: 24px; accent-color: var(--accent); flex: none; }
+.hint { background: var(--surface-2); border-radius: 12px; padding: 10px 12px; font-size: 14px; color: var(--muted); margin-top: 8px; }
+.hint b { color: var(--text); }
+.notice { border: 1px solid #6b4b14; background: #2a1f0b; color: #ffcf7a; border-radius: 12px; padding: 10px 12px; font-size: 14px; margin: 6px 0 10px; display: flex; gap: 8px; align-items: flex-start; }
+.att-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+.att { display: flex; align-items: center; gap: 6px; background: var(--surface-2); border-radius: 12px; padding: 4px 4px 4px 0; }
+.att-open { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; text-align: left; background: none; border: 0; padding: 10px 12px; min-height: 44px; }
+.att-open .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.att .icon-btn { background: var(--surface-3); width: 40px; height: 40px; }
+.file-btn { position: relative; overflow: hidden; }
+.file-btn input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+
+/* Mehr */
+.settings .card { margin-bottom: 10px; }
+.settings h3 { margin: 0 0 6px; font-size: 17px; }
+.settings p { margin: 6px 0; color: var(--muted); font-size: 14px; }
+.place { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); background: none; border-left: 0; border-right: 0; border-top: 0; width: 100%; text-align: left; min-height: 56px; }
+.place:last-of-type { border-bottom: 0; }
+.place .p-main { flex: 1; min-width: 0; }
+.place .p-buf { font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
+.kv { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; font-size: 14px; }
+.kv span:first-child { color: var(--muted); }
+ul.plain { margin: 6px 0; padding-left: 18px; color: var(--muted); font-size: 14px; }
+ul.plain li { margin: 4px 0; }
+
+/* Alarm-Overlay */
+#alarm { position: fixed; inset: 0; z-index: 40; background: radial-gradient(circle at 50% 30%, #3a1212, #0b0d10 70%); display: flex; flex-direction: column; justify-content: center; padding: calc(var(--safe-t) + 24px) 22px calc(var(--safe-b) + 24px); text-align: center; animation: fade .2s; }
+#alarm[hidden] { display: none; }
+#alarm .a-label { color: #ff9b9b; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; font-size: 14px; }
+#alarm .a-time { font-size: 64px; font-weight: 800; margin: 6px 0; font-variant-numeric: tabular-nums; }
+#alarm .a-title { font-size: 22px; font-weight: 700; }
+#alarm .a-loc { color: var(--muted); margin: 6px 0 28px; }
+#alarm .btn { margin-top: 10px; min-height: 58px; font-size: 18px; }
+
+/* Viewer */
+#viewer { position: fixed; inset: 0; z-index: 30; background: #000; display: flex; flex-direction: column; }
+#viewer[hidden] { display: none; }
+.viewer-head { display: flex; align-items: center; gap: 8px; padding: calc(var(--safe-t) + 8px) 10px 8px; background: var(--surface); border-bottom: 1px solid var(--line); }
+.viewer-head .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.viewer-body { flex: 1; overflow: auto; display: flex; align-items: center; justify-content: center; padding-bottom: var(--safe-b); }
+.viewer-body img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.viewer-body iframe { width: 100%; height: 100%; border: 0; background: #fff; }
+.viewer-body pre { white-space: pre-wrap; overflow-wrap: anywhere; align-self: stretch; margin: 0; padding: 16px; width: 100%; color: var(--text); font-size: 14px; }
+
+/* Toast */
+#toast { position: fixed; left: 50%; bottom: calc(var(--tabbar-h) + var(--safe-b) + 92px); transform: translateX(-50%); z-index: 50; background: var(--text); color: var(--bg); padding: 12px 16px; border-radius: 14px; font-weight: 600; font-size: 15px; max-width: calc(100vw - 32px); box-shadow: 0 8px 24px rgba(0,0,0,0.5); display: flex; gap: 12px; align-items: center; }
+#toast[hidden] { display: none; }
+#toast button { background: none; border: 0; color: var(--accent-ink); font-weight: 800; text-decoration: underline; padding: 4px; }
+@media (min-width: 760px) { .sheet { border-radius: 22px; bottom: 20px; border: 1px solid var(--line); } }
+</style>
+</head>
+<body>
+<header class="top">
+  <h1 id="title">Heute</h1>
+  <div class="sub" id="subtitle"></div>
+</header>
+<main id="main" aria-live="polite"></main>
+
+<button class="fab" id="fab" aria-label="Neu anlegen"><svg class="i"><use href="#i-plus"/></svg></button>
+
+<nav class="tabs" aria-label="Bereiche">
+  <button data-view="heute"><svg class="i"><use href="#i-sun"/></svg>Heute</button>
+  <button data-view="aufgaben"><svg class="i"><use href="#i-check"/></svg>Aufgaben<span class="badge" id="badge-tasks" hidden></span></button>
+  <button data-view="termine"><svg class="i"><use href="#i-cal"/></svg>Termine</button>
+  <button data-view="mehr"><svg class="i"><use href="#i-more"/></svg>Mehr</button>
+</nav>
+
+<div id="sheet-root" hidden></div>
+<div id="viewer" hidden></div>
+<div id="alarm" hidden role="alertdialog" aria-live="assertive"></div>
+<div id="toast" hidden role="status"></div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M8 12l3 3 5-6"/></symbol>
+  <symbol id="i-tick" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-nav" viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-8-8-2z"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></symbol>
+  <symbol id="i-car" viewBox="0 0 24 24"><path d="M5 16V11l2-5h10l2 5v5M3 16h18v3h-3v-1H6v1H3z"/><circle cx="7.5" cy="13.5" r="1"/><circle cx="16.5" cy="13.5" r="1"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-clip" viewBox="0 0 24 24"><path d="M21 11l-8.5 8.5a5 5 0 0 1-7-7L14 4a3.5 3.5 0 0 1 5 5l-8.5 8.5a2 2 0 0 1-3-3L15 7"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></symbol>
+  <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.01"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+</svg>
+
+<script>
+'use strict';
+/* ==========================================================================
+   Kommandozentrum – Phase 1
+   Datenhaltung: localStorage (Struktur) + IndexedDB (Anhänge). Nichts verlässt das Gerät.
+   ========================================================================== */
+const APP_VERSION = '1.0.0';
+const LS_KEY = 'kz:data:v1';
+const BACKUP_FORMAT = 'kommandozentrum-backup';
+const PBKDF2_ITER = 600000;
+const ALARM_WINDOW_MIN = 30;           // verpasste Alarme bis 30 min nachholen
+const BIG_FILE = 25 * 1024 * 1024;     // Warnschwelle für Anhänge
+
+const PRIO = { muss: 'Muss', soll: 'Soll', kann: 'Kann' };
+const PRIO_RANK = { muss: 0, soll: 1, kann: 2 };
+const CATS = { dienst: 'Dienst', lernen: 'Lernen', training: 'Training', privat: 'Privat' };
+const BUFFER_PRESETS = [0, 10, 15, 20, 30, 45, 60, 90];
+const CLASSIFIED_HINT = 'Nur lokal auf diesem Gerät gespeichert. Keine eingestuften Dokumente (z. B. VS-NfD oder höher) ablegen.';
+
+/* ---------- Hilfsfunktionen ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
+const pad = (n) => String(n).padStart(2, '0');
+const icon = (name, cls = '') => `<svg class="i ${cls}"><use href="#i-${name}"/></svg>`;
+const dateStr = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const todayStr = () => dateStr(new Date());
+const parseDate = (ds) => { const [y, m, d] = ds.split('-').map(Number); return new Date(y, m - 1, d); };
+const addDays = (ds, n) => { const d = parseDate(ds); d.setDate(d.getDate() + n); return dateStr(d); };
+const toDateTime = (ds, hm) => { const d = parseDate(ds); if (hm) { const [h, mi] = hm.split(':').map(Number); d.setHours(h, mi, 0, 0); } return d; };
+const fmtTime = (d) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+const isDate = (s) => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s);
+const isTime = (s) => typeof s === 'string' && /^\d{2}:\d{2}$/.test(s);
+const str = (s, max = 5000) => (typeof s === 'string' ? s : '').slice(0, max);
+const isIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+function fmtDateLabel(ds) {
+  const t = todayStr();
+  if (ds === t) return 'Heute';
+  if (ds === addDays(t, 1)) return 'Morgen';
+  if (ds === addDays(t, -1)) return 'Gestern';
+  return parseDate(ds).toLocaleDateString('de-DE', { weekday: 'short', day: 'numeric', month: 'short', year: ds.slice(0, 4) === t.slice(0, 4) ? undefined : 'numeric' });
+}
+function fmtRel(ms) {
+  const m = Math.round(ms / 60000);
+  if (m === 0) return 'jetzt';
+  const past = m < 0, a = Math.abs(m);
+  const h = Math.floor(a / 60), r = a % 60;
+  const txt = a < 60 ? `${a} min` : `${h} h${r ? ` ${r} min` : ''}`;
+  return past ? `vor ${txt}` : `in ${txt}`;
+}
+function fmtSize(b) {
+  if (b < 1024) return `${b} B`;
+  if (b < 1024 * 1024) return `${(b / 1024).toFixed(0)} KB`;
+  return `${(b / 1024 / 1024).toFixed(1).replace('.', ',')} MB`;
+}
+function bufToB64(buf) {
+  const bytes = new Uint8Array(buf); let s = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  return btoa(s);
+}
+function b64ToBuf(b64) {
+  const s = atob(b64); const out = new Uint8Array(s.length);
+  for (let i = 0; i < s.length; i++) out[i] = s.charCodeAt(i);
+  return out.buffer;
+}
+
+/* ---------- Zustand (localStorage) ---------- */
+function defaultState() {
+  return { version: 1, tasks: [], events: [], places: [], fired: {}, settings: { taskCat: 'alle', showDone: false, showPast: false } };
+}
+function cleanTask(t) {
+  if (!t || typeof t !== 'object' || typeof t.id !== 'string') return null;
+  return {
+    id: t.id.slice(0, 64), title: str(t.title, 300) || '(ohne Titel)',
+    prio: PRIO[t.prio] ? t.prio : 'soll', cat: CATS[t.cat] ? t.cat : 'privat',
+    due: isDate(t.due) ? t.due : '', dueTime: isTime(t.dueTime) ? t.dueTime : '',
+    notes: str(t.notes), done: !!t.done, doneAt: Number(t.doneAt) || 0, created: Number(t.created) || Date.now()
+  };
+}
+function cleanEvent(e) {
+  if (!e || typeof e !== 'object' || typeof e.id !== 'string' || !isDate(e.date)) return null;
+  return {
+    id: e.id.slice(0, 64), title: str(e.title, 300) || '(ohne Titel)', date: e.date,
+    start: isTime(e.start) ? e.start : '', end: isTime(e.end) ? e.end : '',
+    location: str(e.location, 300), buffer: Math.max(0, Math.min(1440, Math.round(Number(e.buffer) || 0))),
+    alarm: e.alarm !== false, notes: str(e.notes), created: Number(e.created) || Date.now()
+  };
+}
+function cleanPlace(p) {
+  if (!p || typeof p !== 'object' || typeof p.id !== 'string') return null;
+  return { id: p.id.slice(0, 64), name: str(p.name, 200) || '(Ort)', address: str(p.address, 300), buffer: Math.max(0, Math.min(1440, Math.round(Number(p.buffer) || 0))) };
+}
+function normalize(s) {
+  const d = defaultState();
+  if (!s || typeof s !== 'object') return d;
+  d.tasks = (Array.isArray(s.tasks) ? s.tasks : []).map(cleanTask).filter(Boolean);
+  d.events = (Array.isArray(s.events) ? s.events : []).map(cleanEvent).filter(Boolean);
+  d.places = (Array.isArray(s.places) ? s.places : []).map(cleanPlace).filter(Boolean);
+  if (s.fired && typeof s.fired === 'object') for (const [k, v] of Object.entries(s.fired)) if (typeof v === 'string') d.fired[k] = v;
+  const st = s.settings || {};
+  d.settings.taskCat = CATS[st.taskCat] ? st.taskCat : 'alle';
+  d.settings.showDone = !!st.showDone;
+  d.settings.showPast = !!st.showPast;
+  return d;
+}
+function load() {
+  let raw;
+  try { raw = localStorage.getItem(LS_KEY); } catch (e) { return defaultState(); }
+  if (!raw) return defaultState();
+  try { return normalize(JSON.parse(raw)); }
+  catch (e) {
+    try { localStorage.setItem(LS_KEY + ':defekt:' + Date.now(), raw); } catch (_) {}
+    return defaultState();
+  }
+}
+let state = load();
+let persistAsked = false;
+function save() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(state)); }
+  catch (e) { toast('Speichern fehlgeschlagen: ' + e.message); }
+  if (!persistAsked && navigator.storage && navigator.storage.persist) { persistAsked = true; navigator.storage.persist().catch(() => {}); }
+}
+
+/* ---------- Anhänge (IndexedDB) ---------- */
+const Files = (() => {
+  let dbp;
+  const req = (r) => new Promise((res, rej) => { r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
+  function db() {
+    return dbp || (dbp = new Promise((res, rej) => {
+      const r = indexedDB.open('kz-anhaenge', 1);
+      r.onupgradeneeded = () => { const s = r.result.createObjectStore('files', { keyPath: 'id' }); s.createIndex('owner', 'ownerId'); };
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => { dbp = null; rej(r.error); };
+    }));
+  }
+  const store = async (mode) => (await db()).transaction('files', mode).objectStore('files');
+  return {
+    async add(meta, data) { const rec = { ...meta, id: uid(), created: Date.now(), data }; await req((await store('readwrite')).put(rec)); return rec.id; },
+    async put(rec) { await req((await store('readwrite')).put(rec)); },
+    async get(id) { return req((await store('readonly')).get(id)); },
+    async byOwner(ownerId) { return req((await store('readonly')).index('owner').getAll(ownerId)); },
+    async all() { return req((await store('readonly')).getAll()); },
+    async del(id) { await req((await store('readwrite')).delete(id)); },
+    async delOwner(ownerId) { for (const f of await this.byOwner(ownerId)) await this.del(f.id); },
+    async clear() { await req((await store('readwrite')).clear()); },
+    async ownerCounts() {
+      const idx = (await store('readonly')).index('owner');
+      return new Promise((res, rej) => {
+        const counts = {}; const c = idx.openKeyCursor();
+        c.onsuccess = () => { const cur = c.result; if (!cur) return res(counts); counts[cur.key] = (counts[cur.key] || 0) + 1; cur.continue(); };
+        c.onerror = () => rej(c.error);
+      });
+    }
+  };
+})();
+let attCounts = {};
+async function refreshAttCounts() { try { attCounts = await Files.ownerCounts(); } catch (e) { attCounts = {}; } }
+const attBadge = (id) => attCounts[id] ? `<span>${icon('clip', 'sm')} ${attCounts[id]}</span>` : '';
+
+/* ---------- Domänenlogik ---------- */
+const placeKey = (s) => String(s || '').trim().toLowerCase();
+function findPlace(text) {
+  const k = placeKey(text);
+  if (!k) return null;
+  return state.places.find((p) => placeKey(p.name) === k || (p.address && placeKey(p.address) === k)) || null;
+}
+const eventStart = (ev) => (ev.date && ev.start ? toDateTime(ev.date, ev.start) : null);
+function leaveAt(ev) {
+  const s = eventStart(ev);
+  if (!s || !ev.location) return null;
+  return new Date(s.getTime() - (Number(ev.buffer) || 0) * 60000);
+}
+function mapsUrl(location) {
+  const p = findPlace(location);
+  const q = (p && p.address) || location;
+  return `https://maps.apple.com/?daddr=${encodeURIComponent(q)}&dirflg=d`;
+}
+const byEventTime = (a, b) => (a.date + (a.start || '00:00')).localeCompare(b.date + (b.start || '00:00'));
+function byTaskOrder(a, b) {
+  if (PRIO_RANK[a.prio] !== PRIO_RANK[b.prio]) return PRIO_RANK[a.prio] - PRIO_RANK[b.prio];
+  const da = a.due ? a.due + (a.dueTime || '23:59') : '9999', db = b.due ? b.due + (b.dueTime || '23:59') : '9999';
+  return da.localeCompare(db) || a.created - b.created;
+}
+function fmtDue(t) { return `${fmtDateLabel(t.due)}${t.dueTime ? ', ' + t.dueTime : ''}`; }
+function isOverdue(t) {
+  if (t.done || !t.due) return false;
+  const now = new Date();
+  if (t.dueTime) return toDateTime(t.due, t.dueTime) < now;
+  return t.due < todayStr();
+}
+function nextDeparture() {
+  const now = Date.now();
+  let best = null;
+  for (const ev of state.events) {
+    const la = leaveAt(ev); if (!la) continue;
+    const start = eventStart(ev).getTime();
+    if (start < now) continue;                          // Termin hat schon begonnen
+    if (la.getTime() - now > 24 * 3600000) continue;    // nur nächste 24 h
+    if (!best || la < best.la) best = { ev, la };
+  }
+  return best;
+}
+
+/* ---------- Rendering ---------- */
+let view = 'heute';
+const main = $('#main');
+
+function taskItem(t) {
+  const od = isOverdue(t);
+  return `<div class="item task prio-${t.prio}${t.done ? ' done' : ''}" data-task="${esc(t.id)}">
+    <button class="check" data-act="toggle-task" aria-label="${t.done ? 'Als offen markieren' : 'Als erledigt markieren'}"><span class="box">${t.done ? icon('tick', 'sm') : ''}</span></button>
+    <button class="item-main" data-act="edit-task">
+      <span class="item-title">${esc(t.title)}</span>
+      <span class="meta"><span class="pill prio-${t.prio}">${PRIO[t.prio]}</span><span class="pill cat-${t.cat}">${CATS[t.cat]}</span>${t.due ? `<span class="${od ? 'warn' : ''}">${icon('clock', 'sm')} ${esc(fmtDue(t))}</span>` : ''}${attBadge(t.id)}</span>
+    </button>
+  </div>`;
+}
+function eventItem(ev) {
+  const la = leaveAt(ev);
+  const s = eventStart(ev);
+  const past = ev.date < todayStr() || (s && ev.end ? toDateTime(ev.date, ev.end) < new Date() : false);
+  return `<div class="item event${past ? ' past' : ''}" data-event="${esc(ev.id)}">
+    <div class="time-col"><span class="t-start">${esc(ev.start || 'ganzt.')}</span>${ev.end ? `<span class="t-end">${esc(ev.end)}</span>` : ''}</div>
+    <button class="item-main" data-act="edit-event">
+      <span class="item-title">${esc(ev.title)}</span>
+      <span class="meta">${ev.location ? `<span>${icon('pin', 'sm')} ${esc(ev.location)}</span>` : ''}${la ? `<span class="leave">${icon('car', 'sm')} los ${fmtTime(la)}</span>` : ''}${attBadge(ev.id)}</span>
+    </button>
+    ${ev.location ? `<a class="nav-btn" href="${esc(mapsUrl(ev.location))}" target="_blank" rel="noopener noreferrer" aria-label="Navigation starten">${icon('nav')}</a>` : ''}
+  </div>`;
+}
+const section = (title, count, body) => `<section class="section"><div class="section-h"><span>${title}</span>${count != null ? `<span class="count">${count}</span>` : ''}</div>${body}</section>`;
+const listOr = (items, emptyText) => items.length ? `<div class="list">${items.join('')}</div>` : `<div class="empty">${emptyText}</div>`;
+
+function renderHeute() {
+  const t = todayStr();
+  const now = new Date();
+  const nd = nextDeparture();
+  let html = '';
+  if (nd) {
+    const diff = nd.la - now;
+    const urgent = diff < 15 * 60000;
+    html += `<div class="hero${urgent ? ' urgent' : ''}" style="margin-top:4px">
+      <div class="label">${diff <= 0 ? 'Losfahren – jetzt!' : 'Nächster Aufbruch'}</div>
+      <div class="big">${fmtTime(nd.la)}</div>
+      <div class="rel">${fmtRel(diff)}${nd.ev.date !== t ? ' · ' + esc(fmtDateLabel(nd.ev.date)) : ''}</div>
+      <div class="what"><b>${esc(nd.ev.title)}</b><span class="muted">${esc(nd.ev.start)} · ${esc(nd.ev.location)} · ${nd.ev.buffer} min Puffer</span></div>
+      <a class="btn primary block" href="${esc(mapsUrl(nd.ev.location))}" target="_blank" rel="noopener noreferrer">${icon('nav')} Navigation starten</a>
+    </div>`;
+  }
+  const evToday = state.events.filter((e) => e.date === t).sort(byEventTime);
+  html += section('Termine heute', evToday.length, listOr(evToday.map(eventItem), 'Keine Termine heute.'));
+
+  const open = state.tasks.filter((x) => !x.done);
+  const overdue = open.filter(isOverdue).sort(byTaskOrder);
+  const dueToday = open.filter((x) => x.due === t && !isOverdue(x)).sort(byTaskOrder);
+  const shown = new Set([...overdue, ...dueToday].map((x) => x.id));
+  const muss = open.filter((x) => x.prio === 'muss' && !shown.has(x.id)).sort(byTaskOrder);
+  if (overdue.length) html += section('<span class="warn">Überfällig</span>', overdue.length, listOr(overdue.map(taskItem), ''));
+  html += section('Heute fällig', dueToday.length, listOr(dueToday.map(taskItem), 'Nichts fällig heute.'));
+  if (muss.length) html += section('Weitere Muss-Aufgaben', muss.length, listOr(muss.slice(0, 8).map(taskItem), ''));
+  const doneToday = state.tasks.filter((x) => x.done && x.doneAt && dateStr(new Date(x.doneAt)) === t);
+  if (doneToday.length) html += section('Heute erledigt', doneToday.length, listOr(doneToday.map(taskItem), ''));
+
+  const tm = addDays(t, 1);
+  const evTomorrow = state.events.filter((e) => e.date === tm).sort(byEventTime);
+  if (evTomorrow.length) html += section('Morgen', evTomorrow.length, listOr(evTomorrow.map(eventItem), ''));
+  main.innerHTML = html;
+}
+
+function renderAufgaben() {
+  const cat = state.settings.taskCat;
+  const chips = [['alle', 'Alle'], ...Object.entries(CATS)].map(([k, l]) => `<button class="chip${cat === k ? ' on' : ''}" data-act="task-cat" data-cat="${k}">${l}</button>`).join('');
+  const inCat = state.tasks.filter((x) => cat === 'alle' || x.cat === cat);
+  const open = inCat.filter((x) => !x.done);
+  let html = `<div class="chips" role="toolbar" aria-label="Kategorie">${chips}</div>`;
+  if (!inCat.length) html += `<div class="empty" style="margin-top:10px">Noch keine Aufgaben. Tippe auf <b>+</b>.</div>`;
+  for (const p of Object.keys(PRIO)) {
+    const items = open.filter((x) => x.prio === p).sort(byTaskOrder);
+    if (items.length) html += section(PRIO[p], items.length, listOr(items.map(taskItem), ''));
+  }
+  const done = inCat.filter((x) => x.done).sort((a, b) => b.doneAt - a.doneAt);
+  if (done.length) {
+    html += `<div class="toggle-row"><button class="link-btn" data-act="toggle-done">${state.settings.showDone ? 'Erledigte ausblenden' : `Erledigte zeigen (${done.length})`}</button></div>`;
+    if (state.settings.showDone) html += section('Erledigt', done.length, listOr(done.map(taskItem), '') + `<div class="toggle-row"><button class="link-btn" data-act="purge-done">Erledigte endgültig löschen</button></div>`);
+  }
+  main.innerHTML = html;
+}
+
+function renderTermine() {
+  const t = todayStr();
+  const all = [...state.events].sort(byEventTime);
+  const past = all.filter((e) => e.date < t);
+  const coming = all.filter((e) => e.date >= t);
+  let html = '';
+  if (past.length) html += `<div class="toggle-row"><button class="link-btn" data-act="toggle-past">${state.settings.showPast ? 'Vergangene ausblenden' : `Vergangene zeigen (${past.length})`}</button></div>`;
+  const list = state.settings.showPast ? [...past, ...coming] : coming;
+  if (!list.length) html += `<div class="empty" style="margin-top:10px">Keine anstehenden Termine. Tippe auf <b>+</b>.</div>`;
+  const groups = new Map();
+  for (const e of list) { if (!groups.has(e.date)) groups.set(e.date, []); groups.get(e.date).push(e); }
+  for (const [d, evs] of groups) html += section(esc(fmtDateLabel(d)) + (d === t || d === addDays(t, 1) ? ` · ${parseDate(d).toLocaleDateString('de-DE', { weekday: 'short', day: 'numeric', month: 'short' })}` : ''), null, listOr(evs.map(eventItem), ''));
+  main.innerHTML = html;
+}
+
+async function renderMehr() {
+  const places = [...state.places].sort((a, b) => a.name.localeCompare(b.name, 'de'));
+  const perm = 'Notification' in window ? Notification.permission : 'unsupported';
+  const permTxt = { granted: 'erlaubt', denied: 'blockiert (in den Systemeinstellungen ändern)', default: 'noch nicht gefragt', unsupported: 'nicht verfügbar (iPhone: App zum Home-Bildschirm hinzufügen)' }[perm];
+  main.innerHTML = `<div class="settings">
+  <section class="section"><div class="section-h"><span>Orte &amp; Fahrzeit-Puffer</span><span class="count">${places.length}</span></div>
+    <div class="card">
+      ${places.length ? places.map((p) => `<button class="place" data-act="edit-place" data-id="${esc(p.id)}"><span class="p-main"><b>${esc(p.name)}</b><br><span class="muted small">${esc(p.address || 'ohne Adresse – Name wird für Navigation genutzt')}</span></span><span class="p-buf">${p.buffer} min</span></button>`).join('') : '<p>Noch keine Orte. Orte werden beim Speichern eines Termins automatisch gemerkt.</p>'}
+      <button class="btn block" style="margin-top:10px" data-act="new-place">${icon('plus')} Ort hinzufügen</button>
+    </div>
+  </section>
+
+  <section class="section"><div class="section-h"><span>Losfahr-Alarm</span></div>
+    <div class="card">
+      <p>Systembenachrichtigungen: <b>${permTxt}</b></p>
+      <p>Der Alarm löst aus, solange die App geöffnet ist oder im Hintergrund läuft. Für einen garantierten Wecker zusätzlich „In Kalender (.ics)“ im Termin nutzen.</p>
+      <div class="btn-row" style="margin-top:10px">
+        ${perm === 'default' ? `<button class="btn primary" data-act="ask-notify">Benachrichtigungen erlauben</button>` : ''}
+        <button class="btn" data-act="test-alarm">Test-Alarm</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section"><div class="section-h"><span>Daten sichern</span></div>
+    <div class="card">
+      <label class="check-row"><input type="checkbox" id="exp-att"> Anhänge einschließen</label>
+      <label class="check-row"><input type="checkbox" id="exp-enc"> ${icon('lock', 'sm')} Mit Passwort verschlüsseln (AES-256)</label>
+      <div id="exp-pw" hidden>
+        <label class="field"><span>Passwort</span><input type="password" id="exp-pw1" autocomplete="new-password"></label>
+        <label class="field"><span>Passwort wiederholen</span><input type="password" id="exp-pw2" autocomplete="new-password"></label>
+        <p>Ohne Passwort ist das Backup nicht wiederherstellbar.</p>
+      </div>
+      <div class="btn-row" style="margin-top:8px">
+        <button class="btn primary" data-act="export">Exportieren</button>
+        <label class="btn file-btn">Importieren<input type="file" accept=".json,application/json" id="imp-file"></label>
+      </div>
+      <p class="small">Die Datei wird nur lokal erzeugt. Backups nicht in das (öffentliche) GitHub-Repository legen.</p>
+    </div>
+  </section>
+
+  <section class="section"><div class="section-h"><span>Speicher</span></div>
+    <div class="card" id="storage-card"><p>wird ermittelt …</p></div>
+  </section>
+
+  <section class="section"><div class="section-h"><span>Datenschutz</span></div>
+    <div class="card">
+      <ul class="plain">
+        <li>Alle Daten liegen ausschließlich auf diesem Gerät (localStorage + IndexedDB).</li>
+        <li>Kein Server, kein Konto, keine Tracker, keine externen Schriften oder Skripte.</li>
+        <li>Die App blockiert technisch jede Netzwerkanfrage (Content-Security-Policy).</li>
+        <li>„Navigation starten“ übergibt nur das Ziel an Apple Karten – erst beim Antippen.</li>
+        <li>${esc(CLASSIFIED_HINT)}</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section"><div class="section-h"><span>Zurücksetzen</span></div>
+    <div class="card">
+      <button class="btn danger block" data-act="wipe">${icon('trash')} Alle Daten auf diesem Gerät löschen</button>
+    </div>
+  </section>
+  <p class="muted small" style="text-align:center">Kommandozentrum ${APP_VERSION}</p>
+  </div>`;
+  const enc = $('#exp-enc');
+  enc.onchange = () => { $('#exp-pw').hidden = !enc.checked; };
+  $('#imp-file').onchange = (e) => { const f = e.target.files[0]; e.target.value = ''; if (f) importBackup(f); };
+  renderStorage();
+}
+async function renderStorage() {
+  const card = $('#storage-card'); if (!card) return;
+  let est = null, persisted = null;
+  try { if (navigator.storage?.estimate) est = await navigator.storage.estimate(); } catch (_) {}
+  try { if (navigator.storage?.persisted) persisted = await navigator.storage.persisted(); } catch (_) {}
+  const nAtt = Object.values(attCounts).reduce((a, b) => a + b, 0);
+  if (!$('#storage-card')) return;
+  card.innerHTML = `
+    <div class="kv"><span>Aufgaben</span><span>${state.tasks.length}</span></div>
+    <div class="kv"><span>Termine</span><span>${state.events.length}</span></div>
+    <div class="kv"><span>Orte</span><span>${state.places.length}</span></div>
+    <div class="kv"><span>Anhänge</span><span>${nAtt}</span></div>
+    ${est ? `<div class="kv"><span>Belegt</span><span>${fmtSize(est.usage || 0)}${est.quota ? ' von ' + fmtSize(est.quota) : ''}</span></div>` : ''}
+    <div class="kv"><span>Dauerhafter Speicher</span><span>${persisted == null ? 'unbekannt' : persisted ? 'ja' : 'nein'}</span></div>
+    ${persisted === false ? `<button class="btn block" style="margin-top:8px" data-act="persist">Dauerhaften Speicher anfragen</button>` : ''}
+    <p class="small">Tipp: Regelmäßig exportieren. iOS kann Daten von Web-Apps löschen, die lange nicht geöffnet wurden.</p>`;
+}
+
+const TITLES = { heute: 'Heute', aufgaben: 'Aufgaben', termine: 'Termine', mehr: 'Mehr' };
+function render() {
+  $('#title').textContent = TITLES[view];
+  const now = new Date();
+  $('#subtitle').textContent = view === 'heute'
+    ? now.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })
+    : view === 'aufgaben' ? `${state.tasks.filter((t) => !t.done).length} offen`
+    : view === 'termine' ? `${state.events.filter((e) => e.date >= todayStr()).length} anstehend`
+    : 'Orte, Alarm, Daten';
+  document.querySelectorAll('.tabs button').forEach((b) => b.classList.toggle('on', b.dataset.view === view));
+  $('#fab').hidden = view === 'mehr';
+  const badge = $('#badge-tasks');
+  const urgent = state.tasks.filter((t) => !t.done && (isOverdue(t) || t.due === todayStr())).length;
+  badge.hidden = !urgent; badge.textContent = urgent;
+  ({ heute: renderHeute, aufgaben: renderAufgaben, termine: renderTermine, mehr: renderMehr })[view]();
+}
+function setView(v) { view = v; window.scrollTo(0, 0); render(); }
+
+/* ---------- Toast ---------- */
+let toastTimer;
+function toast(msg, action) {
+  const el = $('#toast');
+  el.innerHTML = `<span>${esc(msg)}</span>${action ? `<button>${esc(action.label)}</button>` : ''}`;
+  el.hidden = false;
+  if (action) el.querySelector('button').onclick = () => { el.hidden = true; action.fn(); };
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.hidden = true; }, action ? 6000 : 2600);
+}
+
+/* ---------- Sheets ---------- */
+const sheetRoot = $('#sheet-root');
+let sheetOnClose = null;
+function openSheet(inner, onClose) {
+  if (!sheetRoot.hidden) closeSheet();
+  sheetRoot.innerHTML = `<div class="backdrop"></div><div class="sheet" role="dialog" aria-modal="true">${inner}</div>`;
+  sheetRoot.hidden = false;
+  document.body.classList.add('noscroll');
+  sheetOnClose = onClose || null;
+  sheetRoot.querySelector('.backdrop').onclick = () => closeSheet();
+  sheetRoot.querySelectorAll('[data-close]').forEach((b) => { b.onclick = () => closeSheet(); });
+  return sheetRoot.querySelector('.sheet');
+}
+function closeSheet(saved = false) {
+  if (sheetRoot.hidden) return;
+  const cb = sheetOnClose; sheetOnClose = null;
+  sheetRoot.hidden = true; sheetRoot.innerHTML = '';
+  document.body.classList.remove('noscroll');
+  if (cb) cb(saved);
+}
+const sheetHead = (title) => `<div class="sheet-head"><h2>${esc(title)}</h2><button type="button" class="icon-btn" data-close aria-label="Schließen">${icon('x')}</button></div>`;
+const seg = (name, opts, val, prefix) => `<div class="seg" role="radiogroup">${Object.entries(opts).map(([k, l]) => `<label class="seg-opt ${prefix}-${k}"><input type="radio" name="${name}" value="${k}"${k === val ? ' checked' : ''}><span>${esc(l)}</span></label>`).join('')}</div>`;
+
+/* ---------- Anhänge im Editor ---------- */
+const attSection = () => `<div class="field"><span class="field-label">Anhänge</span>
+  <div class="notice">${icon('warn', 'sm')}<span>${esc(CLASSIFIED_HINT)}</span></div>
+  <div class="att-list" data-att-list></div>
+  <label class="btn block file-btn">${icon('clip')} Datei hinzufügen<input type="file" multiple data-att-input></label></div>`;
+
+function bindAttachments(sheet, ownerType, ownerId, added) {
+  const list = sheet.querySelector('[data-att-list]');
+  const input = sheet.querySelector('[data-att-input]');
+  async function refresh() {
+    let files = [];
+    try { files = await Files.byOwner(ownerId); } catch (e) { list.innerHTML = '<div class="muted small">Anhänge nicht verfügbar (IndexedDB gesperrt).</div>'; return; }
+    files.sort((a, b) => a.created - b.created);
+    list.innerHTML = files.length ? files.map((f) => `<div class="att" data-id="${esc(f.id)}">
+        <button type="button" class="att-open" data-att="open">${icon('file', 'sm')}<span class="nm">${esc(f.name)}</span><span class="muted small">${fmtSize(f.size)}</span></button>
+        <button type="button" class="icon-btn" data-att="share" aria-label="Teilen oder sichern">${icon('share', 'sm')}</button>
+        <button type="button" class="icon-btn" data-att="del" aria-label="Anhang entfernen">${icon('trash', 'sm')}</button>
+      </div>`).join('') : '<div class="muted small">Keine Anhänge.</div>';
+  }
+  input.onchange = async () => {
+    for (const file of [...input.files]) {
+      if (file.size > BIG_FILE && !confirm(`„${file.name}“ ist ${fmtSize(file.size)} groß. Trotzdem speichern?`)) continue;
+      try {
+        const id = await Files.add({ ownerType, ownerId, name: file.name.slice(0, 200), type: file.type || 'application/octet-stream', size: file.size }, await file.arrayBuffer());
+        added.push(id);
+      } catch (e) { toast('Anhang konnte nicht gespeichert werden: ' + (e && e.message || e)); }
+    }
+    input.value = '';
+    await refreshAttCounts();
+    refresh();
+  };
+  list.onclick = async (e) => {
+    const b = e.target.closest('[data-att]'); if (!b) return;
+    const id = b.closest('.att').dataset.id;
+    if (b.dataset.att === 'open') openViewer(id);
+    else if (b.dataset.att === 'share') { const f = await Files.get(id); if (f) shareOrDownload(fileBlob(f), f.name); }
+    else if (b.dataset.att === 'del') {
+      if (!confirm('Anhang entfernen?')) return;
+      await Files.del(id); await refreshAttCounts(); refresh();
+    }
+  };
+  refresh();
+}
+const SAFE_PREVIEW = /^(image\/(png|jpe?g|gif|webp|heic|heif|avif|bmp)|application\/pdf|text\/plain)$/i;
+function fileBlob(f) {
+  // Unbekannte Typen (z. B. HTML/SVG) nie mit ihrem Typ im App-Ursprung öffnen.
+  return new Blob([f.data], { type: SAFE_PREVIEW.test(f.type) ? f.type : 'application/octet-stream' });
+}
+let viewerUrl = null;
+async function openViewer(id) {
+  const f = await Files.get(id); if (!f) return;
+  const v = $('#viewer');
+  let body;
+  if (/^image\//i.test(f.type) && SAFE_PREVIEW.test(f.type)) { viewerUrl = URL.createObjectURL(fileBlob(f)); body = `<img src="${viewerUrl}" alt="${esc(f.name)}">`; }
+  else if (/^application\/pdf$/i.test(f.type)) { viewerUrl = URL.createObjectURL(fileBlob(f)); body = `<iframe src="${viewerUrl}" title="${esc(f.name)}"></iframe>`; }
+  else if (/^text\/plain$/i.test(f.type)) { body = `<pre></pre>`; }
+  else body = `<div class="muted" style="padding:24px;text-align:center">Für diesen Dateityp gibt es keine Vorschau.<br>Über „Teilen“ in einer passenden App öffnen.</div>`;
+  v.innerHTML = `<div class="viewer-head"><button class="icon-btn" data-v="close" aria-label="Schließen">${icon('x')}</button><span class="nm">${esc(f.name)}</span><button class="icon-btn" data-v="share" aria-label="Teilen">${icon('share')}</button></div><div class="viewer-body">${body}</div>`;
+  if (/^text\/plain$/i.test(f.type)) v.querySelector('pre').textContent = new TextDecoder().decode(f.data);
+  v.hidden = false;
+  v.onclick = (e) => {
+    const b = e.target.closest('[data-v]'); if (!b) return;
+    if (b.dataset.v === 'close') { v.hidden = true; v.innerHTML = ''; if (viewerUrl) URL.revokeObjectURL(viewerUrl); viewerUrl = null; }
+    else shareOrDownload(fileBlob(f), f.name);
+  };
+}
+
+/* ---------- Teilen / Herunterladen (lokal) ---------- */
+async function shareOrDownload(blob, name) {
+  const file = new File([blob], name, { type: blob.type });
+  if (navigator.canShare && navigator.canShare({ files: [file] }) && (isIOS() || /Android/i.test(navigator.userAgent))) {
+    try { await navigator.share({ files: [file] }); return; }
+    catch (e) { if (e.name === 'AbortError') return; }
+  }
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name; a.rel = 'noopener';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+}
+// Nach langen asynchronen Schritten (Verschlüsselung) ist die Nutzergeste abgelaufen → eigener Tipp nötig.
+function offerFile(blob, name, info) {
+  const sheet = openSheet(`${sheetHead('Datei bereit')}<div class="sheet-body"><p>${esc(name)}<br><span class="muted small">${fmtSize(blob.size)}${info ? ' · ' + esc(info) : ''}</span></p></div>
+    <div class="sheet-foot"><button type="button" class="btn primary" data-go>${icon('share')} Sichern / Teilen</button></div>`);
+  sheet.querySelector('[data-go]').onclick = async () => { await shareOrDownload(blob, name); closeSheet(); };
+}
+
+/* ---------- Aufgaben-Editor ---------- */
+function editTask(id) {
+  const existing = state.tasks.find((t) => t.id === id);
+  const isNew = !existing;
+  const t = existing ? { ...existing } : { id: uid(), title: '', prio: 'soll', cat: CATS[state.settings.taskCat] ? state.settings.taskCat : 'dienst', due: '', dueTime: '', notes: '', done: false, doneAt: 0, created: Date.now() };
+  const added = [];
+  const sheet = openSheet(`<form novalidate>${sheetHead(isNew ? 'Neue Aufgabe' : 'Aufgabe bearbeiten')}
+    <div class="sheet-body">
+      <label class="field"><span>Titel</span><input name="title" value="${esc(t.title)}" autocomplete="off" enterkeyhint="done" maxlength="300" required></label>
+      <div class="field"><span class="field-label">Priorität</span>${seg('prio', PRIO, t.prio, 'prio')}</div>
+      <div class="field"><span class="field-label">Kategorie</span>${seg('cat', CATS, t.cat, 'cat')}</div>
+      <div class="row2">
+        <label class="field"><span>Frist</span><input type="date" name="due" value="${esc(t.due)}"></label>
+        <label class="field"><span>Uhrzeit (optional)</span><input type="time" name="dueTime" value="${esc(t.dueTime)}"></label>
+      </div>
+      <div class="presets" data-due-presets>
+        <button type="button" data-d="0">Heute</button><button type="button" data-d="1">Morgen</button><button type="button" data-d="7">+1 Woche</button><button type="button" data-d="">Keine</button>
+      </div>
+      <label class="field"><span>Notizen</span><textarea name="notes" rows="3">${esc(t.notes)}</textarea></label>
+      ${attSection()}
+    </div>
+    <div class="sheet-foot">${isNew ? '' : `<button type="button" class="btn danger" data-del aria-label="Löschen">${icon('trash')}</button>`}<button type="submit" class="btn primary">Speichern</button></div>
+  </form>`, (saved) => { if (!saved && isNew && added.length) Files.delOwner(t.id).then(refreshAttCounts); });
+  const form = sheet.querySelector('form');
+  if (isNew) setTimeout(() => form.elements.title.focus(), 250);
+  sheet.querySelector('[data-due-presets]').onclick = (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    form.due.value = b.dataset.d === '' ? '' : addDays(todayStr(), Number(b.dataset.d));
+    if (b.dataset.d === '') form.dueTime.value = '';
+  };
+  bindAttachments(sheet, 'task', t.id, added);
+  form.onsubmit = (e) => {
+    e.preventDefault();
+    const title = form.elements.title.value.trim();
+    if (!title) { form.elements.title.focus(); toast('Bitte einen Titel eingeben'); return; }
+    Object.assign(t, {
+      title, prio: form.querySelector('[name=prio]:checked').value, cat: form.querySelector('[name=cat]:checked').value,
+      due: form.due.value, dueTime: form.due.value ? form.dueTime.value : '', notes: form.notes.value.trim()
+    });
+    const clean = cleanTask(t);
+    if (isNew) state.tasks.push(clean); else state.tasks[state.tasks.findIndex((x) => x.id === t.id)] = clean;
+    save(); closeSheet(true); render();
+    toast(isNew ? 'Aufgabe angelegt' : 'Gespeichert');
+  };
+  const del = sheet.querySelector('[data-del]');
+  if (del) del.onclick = () => {
+    if (!confirm('Aufgabe inkl. Anhänge löschen?')) return;
+    state.tasks = state.tasks.filter((x) => x.id !== t.id);
+    save(); Files.delOwner(t.id).then(refreshAttCounts).then(render);
+    closeSheet(true); render(); toast('Aufgabe gelöscht');
+  };
+}
+function toggleTask(id) {
+  const t = state.tasks.find((x) => x.id === id); if (!t) return;
+  t.done = !t.done; t.doneAt = t.done ? Date.now() : 0;
+  save(); render();
+  if (t.done) toast('Erledigt', { label: 'Rückgängig', fn: () => { t.done = false; t.doneAt = 0; save(); render(); } });
+}
+
+/* ---------- Termin-Editor ---------- */
+function defaultStart() { const d = new Date(); d.setMinutes(0, 0, 0); d.setHours(d.getHours() + 1); return d; }
+function editEvent(id) {
+  const existing = state.events.find((e) => e.id === id);
+  const isNew = !existing;
+  const ds = defaultStart();
+  const de = new Date(ds.getTime() + 3600000);
+  const ev = existing ? { ...existing } : { id: uid(), title: '', date: dateStr(ds), start: fmtTime(ds), end: dateStr(de) === dateStr(ds) ? fmtTime(de) : '', location: '', buffer: 0, alarm: true, notes: '', created: Date.now() };
+  const added = [];
+  const sheet = openSheet(`<form novalidate>${sheetHead(isNew ? 'Neuer Termin' : 'Termin bearbeiten')}
+    <div class="sheet-body">
+      <label class="field"><span>Titel</span><input name="title" value="${esc(ev.title)}" autocomplete="off" enterkeyhint="next" maxlength="300"></label>
+      <label class="field"><span>Datum</span><input type="date" name="date" value="${esc(ev.date)}" required></label>
+      <div class="row2">
+        <label class="field"><span>Beginn</span><input type="time" name="start" value="${esc(ev.start)}"></label>
+        <label class="field"><span>Ende</span><input type="time" name="end" value="${esc(ev.end)}"></label>
+      </div>
+      <label class="field"><span>Ort</span><input name="location" value="${esc(ev.location)}" list="places-dl" autocomplete="off" maxlength="300" placeholder="Name oder Adresse">
+        <datalist id="places-dl">${state.places.map((p) => `<option value="${esc(p.name)}">${esc(p.address)}</option>`).join('')}</datalist></label>
+      <div class="hint" data-place-hint hidden></div>
+      <div class="field"><span class="field-label">Fahrzeit-Puffer (Minuten)</span>
+        <input type="number" name="buffer" inputmode="numeric" min="0" max="1440" step="5" value="${ev.buffer}">
+        <div class="presets" data-buf-presets>${BUFFER_PRESETS.map((m) => `<button type="button" data-m="${m}">${m}</button>`).join('')}</div>
+      </div>
+      <label class="check-row"><input type="checkbox" name="remember" checked> Puffer für diesen Ort merken</label>
+      <label class="check-row"><input type="checkbox" name="alarm"${ev.alarm ? ' checked' : ''}> „Losfahren um …“-Alarm</label>
+      <div class="hint" data-leave></div>
+      <div class="btn-row stack" style="margin-top:10px" data-ev-actions>
+        <a class="btn" data-nav target="_blank" rel="noopener noreferrer">${icon('nav')} Navigation starten</a>
+        <button type="button" class="btn" data-ics>${icon('cal')} In Kalender (.ics)</button>
+      </div>
+      <label class="field"><span>Notizen</span><textarea name="notes" rows="3">${esc(ev.notes)}</textarea></label>
+      ${attSection()}
+    </div>
+    <div class="sheet-foot">${isNew ? '' : `<button type="button" class="btn danger" data-del aria-label="Löschen">${icon('trash')}</button>`}<button type="submit" class="btn primary">Speichern</button></div>
+  </form>`, (saved) => { if (!saved && isNew && added.length) Files.delOwner(ev.id).then(refreshAttCounts); });
+  const form = sheet.querySelector('form');
+  if (isNew) setTimeout(() => form.elements.title.focus(), 250);
+  const hint = sheet.querySelector('[data-place-hint]');
+  const leaveEl = sheet.querySelector('[data-leave]');
+  const navA = sheet.querySelector('[data-nav]');
+  function current() {
+    return cleanEvent({ ...ev, title: form.elements.title.value.trim(), date: form.date.value, start: form.start.value, end: form.end.value, location: form.location.value.trim(), buffer: form.buffer.value, alarm: form.alarm.checked, notes: form.notes.value.trim() });
+  }
+  function update() {
+    const loc = form.location.value.trim();
+    const p = findPlace(loc);
+    hint.hidden = !p;
+    if (p) hint.innerHTML = `Gespeicherter Ort: <b>${esc(p.name)}</b>${p.address ? ' · ' + esc(p.address) : ''} · Puffer ${p.buffer} min`;
+    const c = current();
+    const la = c && leaveAt(c);
+    leaveEl.innerHTML = la ? `${icon('car', 'sm')} Losfahren um <b>${fmtTime(la)}</b> (${esc(fmtDateLabel(c.date))})` : (loc ? 'Beginn eintragen, um die Losfahrzeit zu berechnen.' : 'Ort eintragen, um Navigation und Losfahr-Alarm zu nutzen.');
+    navA.hidden = !loc;
+    if (loc) navA.href = mapsUrl(loc);
+  }
+  form.location.addEventListener('input', () => {
+    const p = findPlace(form.location.value);
+    if (p) form.buffer.value = p.buffer;
+    update();
+  });
+  form.addEventListener('input', update);
+  form.addEventListener('change', update);
+  sheet.querySelector('[data-buf-presets]').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; form.buffer.value = b.dataset.m; update(); };
+  sheet.querySelector('[data-ics]').onclick = () => {
+    const c = current();
+    if (!c) { toast('Bitte ein Datum eingeben'); return; }
+    shareOrDownload(new Blob([buildIcs(c)], { type: 'text/calendar' }), `termin-${c.date}.ics`);
+  };
+  update();
+  bindAttachments(sheet, 'event', ev.id, added);
+  form.onsubmit = (e) => {
+    e.preventDefault();
+    const c = current();
+    if (!form.elements.title.value.trim()) { toast('Bitte einen Titel eingeben'); form.elements.title.focus(); return; }
+    if (!c) { toast('Bitte ein Datum eingeben'); form.date.focus(); return; }
+    if (c.start && c.end && c.end < c.start) { toast('Ende liegt vor Beginn'); return; }
+    if (form.remember.checked && c.location) {
+      const p = findPlace(c.location);
+      if (p) p.buffer = c.buffer;
+      else state.places.push({ id: uid(), name: c.location, address: '', buffer: c.buffer });
+    }
+    if (isNew) state.events.push(c); else state.events[state.events.findIndex((x) => x.id === c.id)] = c;
+    save(); closeSheet(true); render();
+    const la = leaveAt(c);
+    toast(la && c.alarm && la > new Date() ? `Gespeichert · Losfahren um ${fmtTime(la)}` : 'Gespeichert');
+    if (la && c.alarm && 'Notification' in window && Notification.permission === 'default') setTimeout(() => toast('Systembenachrichtigungen für den Alarm erlauben?', { label: 'Erlauben', fn: askNotify }), 2700);
+  };
+  const del = sheet.querySelector('[data-del]');
+  if (del) del.onclick = () => {
+    if (!confirm('Termin inkl. Anhänge löschen?')) return;
+    state.events = state.events.filter((x) => x.id !== ev.id);
+    delete state.fired[ev.id];
+    save(); Files.delOwner(ev.id).then(refreshAttCounts).then(render);
+    closeSheet(true); render(); toast('Termin gelöscht');
+  };
+}
+
+/* ---------- Orte-Editor ---------- */
+function editPlace(id) {
+  const existing = state.places.find((p) => p.id === id);
+  const p = existing ? { ...existing } : { id: uid(), name: '', address: '', buffer: 15 };
+  const sheet = openSheet(`<form novalidate>${sheetHead(existing ? 'Ort bearbeiten' : 'Neuer Ort')}
+    <div class="sheet-body">
+      <label class="field"><span>Name</span><input name="name" value="${esc(p.name)}" autocomplete="off" maxlength="200" placeholder="z. B. Dienststelle"></label>
+      <label class="field"><span>Adresse (für Navigation, optional)</span><input name="address" value="${esc(p.address)}" autocomplete="off" maxlength="300"></label>
+      <div class="field"><span class="field-label">Fahrzeit-Puffer (Minuten)</span>
+        <input type="number" name="buffer" inputmode="numeric" min="0" max="1440" step="5" value="${p.buffer}">
+        <div class="presets" data-buf-presets>${BUFFER_PRESETS.map((m) => `<button type="button" data-m="${m}">${m}</button>`).join('')}</div>
+      </div>
+      <p class="muted small">Der Puffer wird bei neuen Terminen an diesem Ort automatisch übernommen.</p>
+    </div>
+    <div class="sheet-foot">${existing ? `<button type="button" class="btn danger" data-del aria-label="Löschen">${icon('trash')}</button>` : ''}<button type="submit" class="btn primary">Speichern</button></div>
+  </form>`);
+  const form = sheet.querySelector('form');
+  sheet.querySelector('[data-buf-presets]').onclick = (e) => { const b = e.target.closest('button'); if (b) form.buffer.value = b.dataset.m; };
+  form.onsubmit = (e) => {
+    e.preventDefault();
+    const c = cleanPlace({ ...p, name: form.elements.name.value.trim(), address: form.address.value.trim(), buffer: form.buffer.value });
+    if (!form.elements.name.value.trim()) { toast('Bitte einen Namen eingeben'); return; }
+    const dup = state.places.find((x) => x.id !== c.id && placeKey(x.name) === placeKey(c.name));
+    if (dup) { toast('Ein Ort mit diesem Namen existiert bereits'); return; }
+    if (existing) state.places[state.places.findIndex((x) => x.id === c.id)] = c; else state.places.push(c);
+    save(); closeSheet(true); render();
+  };
+  const del = sheet.querySelector('[data-del]');
+  if (del) del.onclick = () => {
+    if (!confirm('Ort löschen? Bestehende Termine behalten ihren Puffer.')) return;
+    state.places = state.places.filter((x) => x.id !== p.id);
+    save(); closeSheet(true); render();
+  };
+}
+
+function chooseNew() {
+  const sheet = openSheet(`${sheetHead('Neu anlegen')}<div class="sheet-body"><div class="btn-row" style="padding-bottom:calc(12px + var(--safe-b))">
+    <button class="btn primary" data-n="task" style="min-height:64px">${icon('check')} Aufgabe</button>
+    <button class="btn primary" data-n="event" style="min-height:64px">${icon('cal')} Termin</button></div></div>`);
+  sheet.querySelector('[data-n=task]').onclick = () => editTask(null);
+  sheet.querySelector('[data-n=event]').onclick = () => editEvent(null);
+}
+
+/* ---------- Kalenderdatei (.ics, lokal erzeugt) ---------- */
+function buildIcs(ev) {
+  const icsEsc = (x) => String(x || '').replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
+  const dt = (d) => `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
+  const n = new Date();
+  const stamp = `${n.getUTCFullYear()}${pad(n.getUTCMonth() + 1)}${pad(n.getUTCDate())}T${pad(n.getUTCHours())}${pad(n.getUTCMinutes())}${pad(n.getUTCSeconds())}Z`;
+  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Kommandozentrum//DE', 'CALSCALE:GREGORIAN', 'BEGIN:VEVENT', `UID:${ev.id}@kommandozentrum.local`, `DTSTAMP:${stamp}`];
+  const s = eventStart(ev);
+  if (s) {
+    let e = ev.end ? toDateTime(ev.date, ev.end) : new Date(s.getTime() + 3600000);
+    if (e <= s) e = new Date(s.getTime() + 3600000);
+    lines.push(`DTSTART:${dt(s)}`, `DTEND:${dt(e)}`);
+  } else {
+    lines.push(`DTSTART;VALUE=DATE:${ev.date.replace(/-/g, '')}`, `DTEND;VALUE=DATE:${addDays(ev.date, 1).replace(/-/g, '')}`);
+  }
+  lines.push(`SUMMARY:${icsEsc(ev.title)}`);
+  if (ev.location) lines.push(`LOCATION:${icsEsc((findPlace(ev.location) || {}).address || ev.location)}`);
+  if (ev.notes) lines.push(`DESCRIPTION:${icsEsc(ev.notes)}`);
+  if (s && ev.location && ev.alarm) {
+    lines.push('BEGIN:VALARM', 'ACTION:DISPLAY', `DESCRIPTION:${icsEsc('Losfahren: ' + ev.title)}`, `TRIGGER:-PT${ev.buffer}M`, 'END:VALARM');
+  }
+  lines.push('END:VEVENT', 'END:VCALENDAR');
+  // Zeilen > 75 Zeichen falten (RFC 5545)
+  return lines.map((l) => { let out = ''; while (l.length > 74) { out += l.slice(0, 74) + '\r\n '; l = l.slice(74); } return out + l; }).join('\r\n') + '\r\n';
+}
+
+/* ---------- Losfahr-Alarm ---------- */
+function checkAlarms() {
+  const now = Date.now();
+  let changed = false;
+  for (const ev of state.events) {
+    if (!ev.alarm) continue;
+    const la = leaveAt(ev); if (!la) continue;
+    const key = String(la.getTime());
+    if (state.fired[ev.id] === key) continue;
+    const diff = now - la.getTime();
+    if (diff >= 0 && diff < ALARM_WINDOW_MIN * 60000) {
+      state.fired[ev.id] = key; changed = true;
+      fireAlarm(ev, la);
+    }
+  }
+  for (const id of Object.keys(state.fired)) if (!state.events.some((e) => e.id === id)) { delete state.fired[id]; changed = true; }
+  if (changed) save();
+  scheduleNextCheck();
+}
+let alarmTimer;
+function scheduleNextCheck() {
+  clearTimeout(alarmTimer);
+  const now = Date.now();
+  let next = Infinity;
+  for (const ev of state.events) {
+    if (!ev.alarm) continue;
+    const la = leaveAt(ev);
+    if (la && la.getTime() > now) next = Math.min(next, la.getTime());
+  }
+  if (next !== Infinity) alarmTimer = setTimeout(checkAlarms, Math.min(next - now + 200, 2 ** 31 - 1));
+}
+function beep() {
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+    const ctx = new AC();
+    [0, 0.35, 0.7, 1.4, 1.75, 2.1].forEach((t) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.frequency.value = 880; o.type = 'square';
+      g.gain.setValueAtTime(0.0001, ctx.currentTime + t);
+      g.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + t + 0.25);
+      o.connect(g).connect(ctx.destination); o.start(ctx.currentTime + t); o.stop(ctx.currentTime + t + 0.3);
+    });
+    setTimeout(() => ctx.close(), 3000);
+  } catch (_) {}
+}
+function fireAlarm(ev, la, test = false) {
+  const late = Date.now() - la.getTime() > 2 * 60000;
+  const el = $('#alarm');
+  el.innerHTML = `<div class="a-label">${test ? 'Test-Alarm' : late ? 'Aufbruch verpasst' : 'Jetzt losfahren'}</div>
+    <div class="a-time">${fmtTime(la)}</div>
+    <div class="a-title">${esc(ev.title)}</div>
+    <div class="a-loc">${esc(ev.location)} · Beginn ${esc(ev.start)} · ${ev.buffer} min Puffer</div>
+    <a class="btn primary block" href="${esc(mapsUrl(ev.location))}" target="_blank" rel="noopener noreferrer" data-a="nav">${icon('nav')} Navigation starten</a>
+    <button class="btn block" data-a="close">Schließen</button>`;
+  el.hidden = false;
+  el.onclick = (e) => { const b = e.target.closest('[data-a]'); if (b) { el.hidden = true; render(); } };
+  beep();
+  if (navigator.vibrate) navigator.vibrate([400, 200, 400, 200, 800]);
+  if ('Notification' in window && Notification.permission === 'granted' && navigator.serviceWorker) {
+    navigator.serviceWorker.ready.then((reg) => reg.showNotification(`Losfahren: ${ev.title}`, {
+      body: `${fmtTime(la)} · ${ev.location} · Beginn ${ev.start}`, tag: 'kz-' + ev.id, renotify: true, requireInteraction: true, icon: 'icons/icon-192.png', badge: 'icons/icon-192.png'
+    })).catch(() => {});
+  }
+}
+async function askNotify() {
+  if (!('Notification' in window)) { toast(isIOS() ? 'Erst „Zum Home-Bildschirm“ hinzufügen, dann erneut versuchen' : 'Nicht unterstützt'); return; }
+  const r = await Notification.requestPermission();
+  toast(r === 'granted' ? 'Benachrichtigungen erlaubt' : 'Nicht erlaubt');
+  if (view === 'mehr') render();
+}
+
+/* ---------- Export / Import ---------- */
+async function deriveKey(pw, salt, iterations) {
+  const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+}
+async function exportBackup() {
+  const withAtt = $('#exp-att').checked;
+  const encrypt = $('#exp-enc').checked;
+  let pw = '';
+  if (encrypt) {
+    pw = $('#exp-pw1').value;
+    if (pw.length < 8) { toast('Passwort: mindestens 8 Zeichen'); return; }
+    if (pw !== $('#exp-pw2').value) { toast('Passwörter stimmen nicht überein'); return; }
+    if (!crypto.subtle) { toast('Verschlüsselung nur über HTTPS verfügbar'); return; }
+  }
+  toast(encrypt ? 'Verschlüssele …' : 'Erzeuge Backup …');
+  try {
+    const payload = { app: 'kommandozentrum', appVersion: APP_VERSION, exportedAt: new Date().toISOString(), state, attachments: null };
+    if (withAtt) payload.attachments = (await Files.all()).map((f) => ({ id: f.id, ownerType: f.ownerType, ownerId: f.ownerId, name: f.name, type: f.type, size: f.size, created: f.created, data: bufToB64(f.data) }));
+    let out;
+    if (encrypt) {
+      const salt = crypto.getRandomValues(new Uint8Array(16));
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const key = await deriveKey(pw, salt, PBKDF2_ITER);
+      const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, new TextEncoder().encode(JSON.stringify(payload)));
+      out = { format: BACKUP_FORMAT, formatVersion: 1, encrypted: true, kdf: { name: 'PBKDF2', hash: 'SHA-256', iterations: PBKDF2_ITER, salt: bufToB64(salt) }, cipher: { name: 'AES-GCM', iv: bufToB64(iv) }, data: bufToB64(ct) };
+    } else {
+      out = { format: BACKUP_FORMAT, formatVersion: 1, encrypted: false, payload };
+    }
+    const blob = new Blob([JSON.stringify(out)], { type: 'application/json' });
+    const name = `kommandozentrum-backup-${todayStr()}${encrypt ? '-verschluesselt' : ''}.json`;
+    $('#exp-pw1') && ($('#exp-pw1').value = '', $('#exp-pw2').value = '');
+    offerFile(blob, name, `${withAtt ? 'mit' : 'ohne'} Anhänge${encrypt ? ', verschlüsselt' : ', unverschlüsselt'}`);
+  } catch (e) { toast('Export fehlgeschlagen: ' + (e && e.message || e)); }
+}
+function askPassword(title) {
+  return new Promise((resolve) => {
+    let done = false;
+    const sheet = openSheet(`<form novalidate>${sheetHead(title)}<div class="sheet-body">
+      <label class="field"><span>Passwort</span><input type="password" name="pw" autocomplete="current-password"></label></div>
+      <div class="sheet-foot"><button type="submit" class="btn primary">Entschlüsseln</button></div></form>`, () => { if (!done) resolve(null); });
+    const form = sheet.querySelector('form');
+    setTimeout(() => form.pw.focus(), 250);
+    form.onsubmit = (e) => { e.preventDefault(); done = true; const v = form.pw.value; closeSheet(true); resolve(v); };
+  });
+}
+async function importBackup(file) {
+  let obj;
+  try { obj = JSON.parse(await file.text()); } catch (_) { toast('Keine gültige JSON-Datei'); return; }
+  if (!obj || obj.format !== BACKUP_FORMAT) { toast('Unbekanntes Backup-Format'); return; }
+  let payload;
+  if (obj.encrypted) {
+    const pw = await askPassword('Backup entschlüsseln');
+    if (pw == null) return;
+    toast('Entschlüssele …');
+    try {
+      const key = await deriveKey(pw, b64ToBuf(obj.kdf.salt), Number(obj.kdf.iterations) || PBKDF2_ITER);
+      const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64ToBuf(obj.cipher.iv) }, key, b64ToBuf(obj.data));
+      payload = JSON.parse(new TextDecoder().decode(pt));
+    } catch (_) { toast('Falsches Passwort oder beschädigte Datei'); return; }
+  } else payload = obj.payload;
+  if (!payload || !payload.state) { toast('Backup enthält keine Daten'); return; }
+  const s = normalize(payload.state);
+  const atts = Array.isArray(payload.attachments) ? payload.attachments : null;
+  const when = payload.exportedAt ? new Date(payload.exportedAt).toLocaleString('de-DE') : 'unbekannt';
+  if (!confirm(`Backup vom ${when} importieren?\n\n${s.tasks.length} Aufgaben, ${s.events.length} Termine, ${s.places.length} Orte${atts ? `, ${atts.length} Anhänge` : ' (ohne Anhänge)'}.\n\nDie aktuellen Daten auf diesem Gerät werden ERSETZT.`)) return;
+  try {
+    if (atts) {
+      await Files.clear();
+      for (const a of atts) {
+        if (!a || typeof a.id !== 'string' || typeof a.data !== 'string') continue;
+        await Files.put({ id: a.id, ownerType: str(a.ownerType, 10), ownerId: str(a.ownerId, 64), name: str(a.name, 200) || 'Datei', type: str(a.type, 100) || 'application/octet-stream', size: Number(a.size) || 0, created: Number(a.created) || Date.now(), data: b64ToBuf(a.data) });
+      }
+    } else {
+      // Backup ohne Anhänge: vorhandene Anhänge behalten, sofern ihr Eintrag noch existiert
+      const ids = new Set([...s.tasks.map((t) => t.id), ...s.events.map((e) => e.id)]);
+      for (const f of await Files.all()) if (!ids.has(f.ownerId)) await Files.del(f.id);
+    }
+  } catch (e) { toast('Anhänge konnten nicht importiert werden: ' + (e && e.message || e)); }
+  state = s; save();
+  await refreshAttCounts();
+  scheduleNextCheck();
+  render(); toast('Import abgeschlossen');
+}
+async function wipeAll() {
+  if (!confirm('Wirklich ALLE Aufgaben, Termine, Orte und Anhänge auf diesem Gerät löschen?')) return;
+  if (!confirm('Letzte Warnung: Das kann nicht rückgängig gemacht werden. Vorher exportiert?')) return;
+  state = defaultState(); save();
+  try { await Files.clear(); } catch (_) {}
+  for (const k of Object.keys(localStorage)) if (k.startsWith('kz:')) localStorage.removeItem(k);
+  save();
+  await refreshAttCounts();
+  setView('heute'); toast('Alle Daten gelöscht');
+}
+
+/* ---------- Ereignisse ---------- */
+document.querySelector('.tabs').addEventListener('click', (e) => { const b = e.target.closest('button[data-view]'); if (b) setView(b.dataset.view); });
+$('#fab').addEventListener('click', () => {
+  if (view === 'aufgaben') editTask(null);
+  else if (view === 'termine') editEvent(null);
+  else chooseNew();
+});
+main.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const act = b.dataset.act;
+  const taskId = b.closest('[data-task]')?.dataset.task;
+  const evId = b.closest('[data-event]')?.dataset.event;
+  switch (act) {
+    case 'toggle-task': toggleTask(taskId); break;
+    case 'edit-task': editTask(taskId); break;
+    case 'edit-event': editEvent(evId); break;
+    case 'task-cat': state.settings.taskCat = b.dataset.cat; save(); render(); break;
+    case 'toggle-done': state.settings.showDone = !state.settings.showDone; save(); render(); break;
+    case 'toggle-past': state.settings.showPast = !state.settings.showPast; save(); render(); break;
+    case 'purge-done': {
+      const cat = state.settings.taskCat;
+      const del = state.tasks.filter((t) => t.done && (cat === 'alle' || t.cat === cat));
+      if (!del.length || !confirm(`${del.length} erledigte Aufgaben inkl. Anhänge endgültig löschen?`)) break;
+      state.tasks = state.tasks.filter((t) => !del.includes(t));
+      save(); Promise.all(del.map((t) => Files.delOwner(t.id))).then(refreshAttCounts).then(render); render(); break;
+    }
+    case 'edit-place': editPlace(b.dataset.id); break;
+    case 'new-place': editPlace(null); break;
+    case 'ask-notify': askNotify(); break;
+    case 'test-alarm': fireAlarm({ title: 'Test-Termin', location: 'Beispielort', start: fmtTime(new Date(Date.now() + 1800000)), buffer: 30 }, new Date(), true); break;
+    case 'export': exportBackup(); break;
+    case 'wipe': wipeAll(); break;
+    case 'persist': navigator.storage?.persist?.().then((ok) => { toast(ok ? 'Dauerhafter Speicher aktiv' : 'Vom Browser abgelehnt'); renderStorage(); }); break;
+  }
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  if (!$('#viewer').hidden) $('#viewer [data-v=close]')?.click();
+  else if (!sheetRoot.hidden) closeSheet();
+});
+document.addEventListener('visibilitychange', () => { if (!document.hidden) { checkAlarms(); if (sheetRoot.hidden) render(); } });
+window.addEventListener('storage', (e) => { if (e.key === LS_KEY) { state = load(); render(); } });
+setInterval(() => {
+  checkAlarms();
+  if (sheetRoot.hidden && (view === 'heute' || view === 'termine')) render();
+}, 30000);
+
+/* ---------- Service Worker ---------- */
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  navigator.serviceWorker.register('./sw.js', { scope: './' }).then((reg) => {
+    const offer = (w) => toast('Neue Version verfügbar', { label: 'Aktualisieren', fn: () => w.postMessage('skipWaiting') });
+    if (reg.waiting && navigator.serviceWorker.controller) offer(reg.waiting);
+    reg.addEventListener('updatefound', () => {
+      const w = reg.installing;
+      w && w.addEventListener('statechange', () => { if (w.state === 'installed' && navigator.serviceWorker.controller) offer(w); });
+    });
+  }).catch(() => {});
+  // Nur nach einem Update neu laden, nicht bei der Erstinstallation.
+  const hadController = !!navigator.serviceWorker.controller;
+  let reloaded = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadController && !reloaded) { reloaded = true; location.reload(); } });
+}
+
+/* ---------- Start ---------- */
+render();
+refreshAttCounts().then(() => { if (sheetRoot.hidden) render(); });
+checkAlarms();
+</script>
+</body>
+</html>
