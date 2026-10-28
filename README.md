@@ -63,6 +63,14 @@ Persönliche PWA für den Alltag: Heute-Ansicht, Aufgaben (Muss/Soll/Kann, Frist
   - Fenster und Prozentsatz sind unter Mehr → Orte einstellbar, der Zuschlag lässt sich dort auch abschalten.
   - Er wirkt auf Alarm, Vorwarnung, Aufbruch-Karte, Briefing, Abend-Check und die .ics-Datei.
 
+**Phase 2.3**
+- **Links / Schnellzugriff**:
+  - Oft genutzte Seiten (z. B. Deutsche Bahn, Dienstportal, Lernplattform) speichern: Adresse, Name, optionale Gruppe und Notiz.
+  - Angepinnte Links erscheinen als Kacheln oben auf „Heute“. „Alle Links“ öffnet die durchsuchbare Liste, nach Gruppen sortiert.
+  - Anlegen über Mehr → Links oder den Plus-Button → „Link“. Die Deutsche Bahn lässt sich mit einem Tipp hinzufügen.
+  - Die App ruft die Seiten nie selbst ab. Sie öffnen sich erst beim Antippen im Browser, ohne Referrer.
+  - Erlaubt sind nur Web-, Telefon- und Mail-Adressen.
+
 ### Schnell-Eingabe
 
 | Was | Schreibweise |

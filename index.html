@@ -307,6 +307,22 @@ details.help code { background: var(--surface-3); padding: 1px 5px; border-radiu
 .cl-add .inp { flex: 1; }
 .ok { color: var(--ok) !important; font-weight: 600; }
 
+/* Links / Schnellzugriff */
+.ql-row { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 6px; margin: 0 -2px; scrollbar-width: none; }
+.ql-row::-webkit-scrollbar { display: none; }
+.ql { flex: none; width: 76px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-decoration: none; color: var(--text); font-size: 12px; font-weight: 600; background: none; border: 0; padding: 4px 0; }
+.ql .av, .lk .av { display: grid; place-items: center; font-weight: 800; color: #0b0d10; flex: none; }
+.ql .av { width: 56px; height: 56px; border-radius: 16px; font-size: 22px; }
+.ql .lt { width: 100%; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ql.more .av { background: var(--surface-2); color: var(--text); border: 1px solid var(--line); }
+.lk { display: flex; align-items: center; gap: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; min-height: 60px; overflow: hidden; }
+.lk a { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; padding: 8px 0 8px 10px; text-decoration: none; color: var(--text); }
+.lk .av { width: 40px; height: 40px; border-radius: 12px; font-size: 17px; }
+.lk .lm { min-width: 0; display: flex; flex-direction: column; }
+.lk .lm b, .lk .lm span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lk .lm span { color: var(--muted); font-size: 13px; }
+.lk .icon-btn { background: none; color: var(--muted); margin-right: 6px; }
+
 /* Fahrzeit-Warnung & Berufsverkehr */
 .warn-card { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; background: linear-gradient(140deg, #3a1616, #14171c 70%); border: 1px solid #6b2a2a; border-radius: var(--radius); padding: 14px; margin-top: 10px; color: var(--text); min-height: 56px; }
 .warn-card .ec-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
@@ -408,6 +424,8 @@ ul.plain li { margin: 4px 0; }
   <symbol id="i-left" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
   <symbol id="i-right" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
   <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M4 16V5a2 2 0 0 1 2-2h11"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></symbol>
   <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
 </svg>
 
@@ -417,7 +435,7 @@ ul.plain li { margin: 4px 0; }
    Kommandozentrum – Phase 2
    Datenhaltung: localStorage (Struktur) + IndexedDB (Anhänge). Nichts verlässt das Gerät.
    ========================================================================== */
-const APP_VERSION = '2.2.1';
+const APP_VERSION = '2.3.0';
 const LS_KEY = 'kz:data:v1';
 const BACKUP_FORMAT = 'kommandozentrum-backup';
 const PBKDF2_ITER = 600000;
@@ -500,7 +518,7 @@ function b64ToBuf(b64) {
 /* ---------- Zustand (localStorage) ---------- */
 function defaultState() {
   return {
-    version: 2, tasks: [], events: [], places: [], routines: [], templates: [], fired: {},
+    version: 2, tasks: [], events: [], places: [], routines: [], templates: [], links: [], fired: {},
     settings: { taskCat: 'alle', showDone: false, showPast: false, planMode: 'tag', brief: true, lastBrief: '', lastExport: 0, preAlert: 10, evening: true, eveningTime: '20:00', lastEvening: '', lastEveningNote: '', defaultBuffer: 30, rushPct: 25, rushWindows: [['06:00', '09:00'], ['15:00', '18:00']] }
   };
 }
@@ -561,6 +579,23 @@ function cleanRoutine(r) {
   }
   return base;
 }
+const hostOf = (url) => { try { return new URL(url).hostname.replace(/^www\./, '') || url; } catch (_) { return url; } };
+// Nur Web-, Telefon- und Mail-Adressen zulassen (kein javascript:, data: …)
+function cleanUrl(u) {
+  let v = String(u || '').trim();
+  if (!v) return '';
+  if (!/^[a-z][a-z0-9+.-]*:/i.test(v)) v = 'https://' + v;
+  try { const x = new URL(v); return ['https:', 'http:', 'tel:', 'mailto:'].includes(x.protocol) ? x.href.slice(0, 2000) : ''; } catch (_) { return ''; }
+}
+function cleanLink(l) {
+  if (!l || typeof l !== 'object' || !cleanId(l.id)) return null;
+  const url = cleanUrl(l.url);
+  if (!url) return null;
+  return {
+    id: cleanId(l.id), title: str(l.title, 100).trim() || hostOf(url), url, group: str(l.group, 60).trim(),
+    pinned: !!l.pinned, notes: str(l.notes, 1000).trim(), uses: clampInt(l.uses, 0, 1e6, 0), lastUsed: Number(l.lastUsed) || 0
+  };
+}
 function cleanTemplate(t) {
   if (!t || typeof t !== 'object' || !cleanId(t.id)) return null;
   const ev = t.event && typeof t.event === 'object' ? {
@@ -581,6 +616,7 @@ function normalize(s) {
   d.places = arr(s.places, cleanPlace);
   d.routines = arr(s.routines, cleanRoutine);
   d.templates = arr(s.templates, cleanTemplate);
+  d.links = arr(s.links, cleanLink);
   if (s.fired && typeof s.fired === 'object') for (const [k, v] of Object.entries(s.fired)) if (typeof v === 'string') d.fired[k.slice(0, 120)] = v;
   const st = s.settings || {};
   d.settings.taskCat = CATS[st.taskCat] ? st.taskCat : 'alle';
@@ -894,6 +930,8 @@ function renderHeute() {
   if (missing.length) html += `<button class="warn-card" data-act="show-missing">${icon('warn')}<span class="ec-main"><b>${missing.length === 1 ? '1 Termin' : `${missing.length} Termine`} ohne Fahrzeit</b><span class="ec-sub">in den nächsten 7 Tagen – Alarm käme zu spät</span></span>${icon('right', 'sm')}</button>`;
   if (eveningActive()) html += `<button class="eve-card" data-act="show-evening">${icon('moon')}<span class="ec-main"><b>Morgen vorbereiten</b><span class="ec-sub">${esc(tomorrowSummary())}</span></span>${icon('right', 'sm')}</button>`;
 
+  html += quickLinksHtml();
+
   // Jetzt läuft – mehrere Dinge parallel
   const items = timedItems(t);
   const active = items.filter((it) => !(it.kind === 'task' && it.ref.done));
@@ -1059,6 +1097,13 @@ function renderMehr() {
   const perm = 'Notification' in window ? Notification.permission : 'unsupported';
   const permTxt = { granted: 'erlaubt', denied: 'blockiert (in den Systemeinstellungen ändern)', default: 'noch nicht gefragt', unsupported: 'nicht verfügbar (iPhone: App zum Home-Bildschirm hinzufügen)' }[perm];
   main.innerHTML = `<div class="settings">
+  <section class="section"><div class="section-h"><span>Links</span><span class="count">${state.links.length}</span></div>
+    <div class="card">
+      ${state.links.length ? sortedLinks().map((l) => `<button class="lrow" data-act="edit-link" data-id="${esc(l.id)}"><span class="l-main"><b>${esc(l.title)}</b><br><span class="muted small">${esc(hostOf(l.url))}${l.group ? ' · ' + esc(l.group) : ''}</span></span><span class="l-side">${l.pinned ? 'auf Heute' : ''}</span></button>`).join('') : '<p>Oft genutzte Seiten – z. B. Bahn, Dienstportal, Lernplattform – mit einem Tipp öffnen. Angepinnte Links erscheinen oben auf „Heute“.</p>'}
+      <div class="btn-row" style="margin-top:10px"><button class="btn" data-act="new-link">${icon('plus')} Link</button>${state.links.some((l) => hostOf(l.url).endsWith('bahn.de')) ? '' : `<button class="btn" data-act="example-link">${icon('plus')} Deutsche Bahn</button>`}</div>
+    </div>
+  </section>
+
   <section class="section"><div class="section-h"><span>Routinen</span><span class="count">${routines.length}</span></div>
     <div class="card">
       ${routines.length ? routines.map((r) => `<button class="lrow" data-act="edit-routine" data-id="${esc(r.id)}"><span class="l-main"><b>${esc(r.title)}</b><br><span class="muted small">${icon('repeat', 'sm')} ${esc(ruleText(r))}${r.kind === 'event' && r.start ? ' · ' + esc(r.start) + (r.end ? '–' + esc(r.end) : '') : ''}${r.kind === 'task' && r.lead ? ` · ${r.lead} T Vorlauf` : ''}</span></span><span class="l-side">${r.kind === 'event' ? 'Termin' : 'Aufgabe'}</span></button>`).join('') : '<p>Wiederkehrendes wie Unterricht, Training oder Wochenbericht. Tipp: In der Schnell-Eingabe z. B. „werktags 7:30-16:00 Unterricht“.</p>'}
@@ -1185,6 +1230,7 @@ async function renderStorage() {
     <div class="kv"><span>Routinen</span><span>${state.routines.length}</span></div>
     <div class="kv"><span>Vorlagen</span><span>${state.templates.length}</span></div>
     <div class="kv"><span>Orte</span><span>${state.places.length}</span></div>
+    <div class="kv"><span>Links</span><span>${state.links.length}</span></div>
     <div class="kv"><span>Anhänge</span><span>${nAtt}</span></div>
     ${est ? `<div class="kv"><span>Belegt</span><span>${fmtSize(est.usage || 0)}${est.quota ? ' von ' + fmtSize(est.quota) : ''}</span></div>` : ''}
     <div class="kv"><span>Dauerhafter Speicher</span><span>${persisted == null ? 'unbekannt' : persisted ? 'ja' : 'nein'}</span></div>
@@ -2022,6 +2068,7 @@ function quickEntry(opts = {}) {
         <button type="button" class="btn sm" data-f="task">${icon('check', 'sm')} Aufgabe</button>
         <button type="button" class="btn sm" data-f="event">${icon('cal', 'sm')} Termin</button>
         <button type="button" class="btn sm" data-f="tpl">${icon('copy', 'sm')} Vorlage</button>
+        <button type="button" class="btn sm" data-f="link">${icon('link', 'sm')} Link</button>
       </div>
     </div>
     <div class="sheet-foot"><button type="button" class="btn" data-details>Details …</button><button type="submit" class="btn primary">Speichern</button></div>
@@ -2043,6 +2090,7 @@ function quickEntry(opts = {}) {
   sheet.querySelector('[data-f=task]').onclick = () => editTask(null, { prefill: baseDate ? { due: baseDate } : {} });
   sheet.querySelector('[data-f=event]').onclick = () => editEvent(null, { prefill: baseDate ? { date: baseDate } : {} });
   sheet.querySelector('[data-f=tpl]').onclick = () => chooseTemplate();
+  sheet.querySelector('[data-f=link]').onclick = () => editLink(null);
   sheet.querySelector('[data-details]').onclick = () => {
     const p = parsed;
     if (type() === 'event') editEvent(null, { prefill: { ...quickToEvent(p, baseDate), rule: p.rule } });
@@ -2063,6 +2111,97 @@ function newAt(ds, start) {
     <button class="btn primary" data-n="task" style="min-height:64px">${icon('check')} Aufgabe einplanen</button></div></div>`);
   sheet.querySelector('[data-n=event]').onclick = () => editEvent(null, { prefill: { date: ds, start, end } });
   sheet.querySelector('[data-n=task]').onclick = () => editTask(null, { prefill: { planDate: ds, planStart: start, planEnd: end } });
+}
+
+/* ---------- Links (Schnellzugriff) ---------- */
+// Die App ruft die Seiten nie selbst ab – sie werden erst beim Antippen im Browser geöffnet.
+const AV_COLORS = ['#4f9cff', '#b48cff', '#3ddc97', '#ff7ab6', '#ffb547', '#5ec8e5', '#ff8a5c'];
+function linkAvatar(l) {
+  const h = [...hostOf(l.url)].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
+  const w = l.title.trim().split(/\s+/).filter(Boolean);
+  const ini = (w.length > 1 ? w[0][0] + w[1][0] : (w[0] || '?').slice(0, 2)).toUpperCase();
+  return `<span class="av" style="background:${AV_COLORS[h % AV_COLORS.length]}">${esc(ini)}</span>`;
+}
+const linkAttrs = (l) => `href="${esc(l.url)}" target="_blank" rel="noopener noreferrer" data-link="${esc(l.id)}"`;
+const sortedLinks = () => [...state.links].sort((a, b) => a.title.localeCompare(b.title, 'de'));
+function quickLinksHtml() {
+  if (!state.links.length) return '';
+  const pinned = sortedLinks().filter((l) => l.pinned);
+  const list = pinned.length ? pinned : [...state.links].sort((a, b) => b.uses - a.uses || a.title.localeCompare(b.title, 'de')).slice(0, 6);
+  return section('Schnellzugriff', null, `<div class="ql-row">${list.map((l) => `<a class="ql" ${linkAttrs(l)}>${linkAvatar(l)}<span class="lt">${esc(l.title)}</span></a>`).join('')}
+    <button class="ql more" data-act="show-links"><span class="av">${icon('link')}</span><span class="lt">Alle Links</span></button></div>`);
+}
+function countLinkUse(id) {
+  const l = state.links.find((x) => x.id === id);
+  if (l) { l.uses++; l.lastUsed = Date.now(); save(); }
+}
+const EXAMPLE_LINK = { title: 'Deutsche Bahn', url: 'https://www.bahn.de/', group: 'Reisen', pinned: true };
+function addExampleLink() {
+  state.links.push(cleanLink({ ...EXAMPLE_LINK, id: uid() }));
+  save(); render(); toast('Deutsche Bahn hinzugefügt');
+}
+const linkRow = (l) => `<div class="lk"><a ${linkAttrs(l)}>${linkAvatar(l)}<span class="lm"><b>${esc(l.title)}</b><span>${esc(hostOf(l.url))}${l.notes ? ' · ' + esc(l.notes) : ''}</span></span></a><button type="button" class="icon-btn" data-edit-link="${esc(l.id)}" aria-label="Link bearbeiten">${icon('edit', 'sm')}</button></div>`;
+function showLinks() {
+  const sheet = openSheet(`${sheetHead('Links')}<div class="sheet-body">
+      <input class="inp" type="search" data-q placeholder="Suchen …" autocomplete="off" aria-label="Links durchsuchen">
+      <div data-list style="margin-top:6px"></div></div>
+    <div class="sheet-foot"><button type="button" class="btn primary" data-new>${icon('plus')} Link hinzufügen</button></div>`);
+  const list = sheet.querySelector('[data-list]');
+  const q = sheet.querySelector('[data-q]');
+  const draw = () => {
+    if (!state.links.length) {
+      list.innerHTML = `<div class="empty" style="margin-top:10px">Noch keine Links.</div><button type="button" class="btn block" style="margin-top:10px" data-example>${icon('plus')} Deutsche Bahn hinzufügen</button>`;
+      return;
+    }
+    const term = q.value.trim().toLowerCase();
+    const items = sortedLinks().filter((l) => !term || `${l.title} ${l.url} ${l.group} ${l.notes}`.toLowerCase().includes(term));
+    const groups = new Map();
+    for (const l of items) { const g = l.group || ''; if (!groups.has(g)) groups.set(g, []); groups.get(g).push(l); }
+    const names = [...groups.keys()].sort((a, b) => (!a) - (!b) || a.localeCompare(b, 'de'));
+    list.innerHTML = items.length ? names.map((g) => section(esc(g || (groups.size > 1 ? 'Ohne Gruppe' : 'Alle')), groups.get(g).length, `<div class="list">${groups.get(g).map(linkRow).join('')}</div>`)).join('') : '<p class="muted">Nichts gefunden.</p>';
+  };
+  q.addEventListener('input', draw);
+  draw();
+  sheet.querySelector('[data-new]').onclick = () => editLink(null, { fromList: true });
+  list.onclick = (e) => {
+    const a = e.target.closest('[data-link]'); if (a) { countLinkUse(a.dataset.link); return; }
+    const ed = e.target.closest('[data-edit-link]'); if (ed) { editLink(ed.dataset.editLink, { fromList: true }); return; }
+    if (e.target.closest('[data-example]')) { addExampleLink(); draw(); }
+  };
+}
+function editLink(id, opts = {}) {
+  const existing = state.links.find((l) => l.id === id);
+  const l = existing ? { ...existing } : { id: uid(), title: '', url: '', group: '', pinned: true, notes: '', uses: 0, lastUsed: 0 };
+  const groups = [...new Set(state.links.map((x) => x.group).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'de'));
+  const sheet = openSheet(`<form novalidate>${sheetHead(existing ? 'Link bearbeiten' : 'Neuer Link')}
+    <div class="sheet-body">
+      <label class="field"><span>Adresse</span><input name="url" type="url" inputmode="url" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="z. B. bahn.de" value="${esc(l.url)}"></label>
+      <label class="field"><span>Name</span><input name="ltitle" value="${esc(l.title)}" maxlength="100" autocomplete="off" placeholder="z. B. Bahn – Zug buchen"></label>
+      <label class="field"><span>Gruppe (optional)</span><input name="group" list="link-groups" value="${esc(l.group)}" maxlength="60" autocomplete="off" placeholder="z. B. Reisen, Dienst, Lernen"><datalist id="link-groups">${groups.map((g) => `<option value="${esc(g)}">`).join('')}</datalist></label>
+      <label class="check-row"><input type="checkbox" name="pinned"${l.pinned ? ' checked' : ''}> Im Schnellzugriff auf „Heute“ zeigen</label>
+      <label class="field"><span>Notiz (optional)</span><input name="notes" value="${esc(l.notes)}" maxlength="1000" autocomplete="off" placeholder="z. B. mit BahnCard-Konto anmelden"></label>
+      <p class="muted small">Die Seite öffnet sich erst beim Antippen im Browser – die App selbst ruft nichts ab. Keine Passwörter in Notizen speichern.</p>
+    </div>
+    <div class="sheet-foot">${existing ? `<button type="button" class="btn danger" data-del aria-label="Löschen">${icon('trash')}</button>` : ''}<button type="submit" class="btn primary">Speichern</button></div>
+  </form>`);
+  const form = sheet.querySelector('form');
+  const el = form.elements;
+  if (!existing) setTimeout(() => el.url.focus(), 250);
+  const done = (msg) => { save(); closeSheet(true); render(); if (opts.fromList) showLinks(); if (msg) toast(msg); };
+  form.onsubmit = (e) => {
+    e.preventDefault();
+    const url = cleanUrl(el.url.value);
+    if (!url) { toast('Bitte eine gültige Adresse eingeben, z. B. bahn.de'); el.url.focus(); return; }
+    const c = cleanLink({ ...l, url, title: el.ltitle.value.trim(), group: el.group.value.trim(), pinned: el.pinned.checked, notes: el.notes.value.trim() });
+    if (existing) state.links[state.links.findIndex((x) => x.id === c.id)] = c; else state.links.push(c);
+    done(existing ? 'Link gespeichert' : `„${c.title}“ hinzugefügt`);
+  };
+  const del = sheet.querySelector('[data-del]');
+  if (del) del.onclick = () => {
+    if (!confirm(`Link „${l.title}“ löschen?`)) return;
+    state.links = state.links.filter((x) => x.id !== l.id);
+    done('Link gelöscht');
+  };
 }
 
 /* ---------- Tagesbriefing ---------- */
@@ -2387,7 +2526,7 @@ async function importBackup(file) {
   const s = normalize(payload.state);
   const atts = Array.isArray(payload.attachments) ? payload.attachments : null;
   const when = payload.exportedAt ? new Date(payload.exportedAt).toLocaleString('de-DE') : 'unbekannt';
-  if (!confirm(`Backup vom ${when} importieren?\n\n${s.tasks.length} Aufgaben, ${s.events.length} Termine, ${s.routines.length} Routinen, ${s.templates.length} Vorlagen, ${s.places.length} Orte${atts ? `, ${atts.length} Anhänge` : ' (ohne Anhänge)'}.\n\nDie aktuellen Daten auf diesem Gerät werden ERSETZT.`)) return;
+  if (!confirm(`Backup vom ${when} importieren?\n\n${s.tasks.length} Aufgaben, ${s.events.length} Termine, ${s.routines.length} Routinen, ${s.templates.length} Vorlagen, ${s.places.length} Orte, ${s.links.length} Links${atts ? `, ${atts.length} Anhänge` : ' (ohne Anhänge)'}.\n\nDie aktuellen Daten auf diesem Gerät werden ERSETZT.`)) return;
   try {
     if (atts) {
       await Files.clear();
@@ -2425,6 +2564,8 @@ document.querySelector('.tabs').addEventListener('click', (e) => { const b = e.t
 $('#fab').addEventListener('click', () => quickEntry({ baseDate: view === 'plan' && state.settings.planMode === 'tag' ? planDate : '' }));
 $('#hdr-btn').addEventListener('click', showBrief);
 main.addEventListener('click', (e) => {
+  const ln = e.target.closest('[data-link]');
+  if (ln) { countLinkUse(ln.dataset.link); return; }   // Link öffnet sich normal im Browser
   const b = e.target.closest('[data-act]'); if (!b) return;
   const act = b.dataset.act;
   const taskId = b.closest('[data-task]')?.dataset.task;
@@ -2468,6 +2609,10 @@ main.addEventListener('click', (e) => {
     case 'show-brief': showBrief(); break;
     case 'show-evening': showEvening(); break;
     case 'show-missing': showMissing(); break;
+    case 'show-links': showLinks(); break;
+    case 'edit-link': editLink(b.dataset.id); break;
+    case 'new-link': editLink(null); break;
+    case 'example-link': addExampleLink(); break;
     case 'edit-place': editPlace(b.dataset.id); break;
     case 'new-place': editPlace(null); break;
     case 'ask-notify': askNotify(); break;
