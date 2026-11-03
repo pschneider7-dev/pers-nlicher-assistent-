@@ -2,7 +2,7 @@
  * Cacht ausschließlich die eigenen App-Dateien (keine Nutzerdaten).
  * Bei jeder Änderung an index.html o. Ä. CACHE_VERSION erhöhen. */
 'use strict';
-const CACHE_VERSION = 'kz-v2.3.0';
+const CACHE_VERSION = 'kz-v3.0.0';
 const ASSETS = [
   './',
   './index.html',
@@ -49,17 +49,5 @@ self.addEventListener('fetch', (event) => {
   }
   event.respondWith(
     caches.match(req, { ignoreSearch: true }).then((cached) => cached || fetch(req))
-  );
-});
-
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close();
-  event.waitUntil(
-    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
-      for (const client of list) {
-        if ('focus' in client) return client.focus();
-      }
-      return self.clients.openWindow('./');
-    })
   );
 });
